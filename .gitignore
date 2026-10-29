@@ -1,0 +1,5 @@
+# Secretos y datos reales: NUNCA al repositorio
+.env
+database/datos_migrados.sql
+*.log
+.DS_Store

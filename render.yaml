@@ -1,0 +1,22 @@
+# Blueprint de Render: crea el servicio web a partir del Dockerfile.
+services:
+  - type: web
+    name: controlshop
+    runtime: docker
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: DB_HOST
+        sync: false        # se pide al crear el servicio (no queda escrito en el repositorio)
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_NAME
+        value: postgres
+      - key: DB_SSLMODE
+        value: require
+      - key: APP_DEBUG
+        value: "0"

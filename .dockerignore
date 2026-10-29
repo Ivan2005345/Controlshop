@@ -1,0 +1,6 @@
+.git
+.env
+database
+README.md
+render.yaml
+*.log

@@ -1,0 +1,199 @@
+# ControlShop
+
+Aplicación web para pequeños negocios: inventario, ventas, reportes y equipo de trabajo.
+Cada persona que se registra crea **su propio negocio** (datos aislados de los demás) y puede
+crear cuentas de **empleado**.
+
+- **Tecnología:** PHP 8.2 (sin framework) · PostgreSQL en Supabase · Apache en Docker · Render.
+- **Roles:**
+  | | Administrador | Empleado |
+  |---|---|---|
+  | Resumen | Todo el negocio | Solo sus ventas |
+  | Nueva venta | ✅ | ✅ |
+  | Historial de ventas | Todas | Solo las suyas |
+  | Inventario | Crear, editar, desactivar | Solo consultar |
+  | Reportes | ✅ | ❌ |
+  | Equipo (crear cuentas, desactivar, cambiar clave) | ✅ | ❌ |
+
+> ⚠️ **Estado de las pruebas.** Este código fue escrito y revisado de forma estática (sintaxis,
+> enlaces, consistencia del SQL y de los datos migrados), pero **no se pudo ejecutar** en el entorno
+> donde se preparó (no había PHP ni PostgreSQL). Por eso la sección 8 incluye una lista de pruebas
+> manuales: hazlas en local antes de publicar y corrige/avísame de lo que falle.
+
+---
+
+## 1. Estructura
+
+```
+controlshop/
+├── public/                  ← lo único que Apache publica en internet
+│   ├── index.php            portada (reemplaza conocenos/contacto/planes)
+│   ├── login.php  registro.php  logout.php
+│   ├── dashboard.php        resumen (reemplaza home.php + dashboard.php)
+│   ├── inventario.php  vender.php  ventas.php
+│   ├── reportes.php  usuarios.php        (solo administrador)
+│   └── assets/ css/app.css · js/app.js · img/
+├── src/                     ← lógica (NO accesible desde internet)
+│   ├── bootstrap.php        arranque, errores, variables de entorno
+│   ├── db.php               conexión PDO a PostgreSQL
+│   ├── auth.php             sesiones, roles, permisos
+│   ├── sales.php            registrar una venta (transacción)
+│   ├── helpers.php  layout.php
+├── database/
+│   ├── schema.sql           esquema para Supabase
+│   └── datos_migrados.sql   tus datos antiguos (NO se sube a GitHub)
+├── Dockerfile  render.yaml  .env.example  .gitignore  .dockerignore
+```
+
+## 2. Qué cambió respecto al proyecto antiguo
+
+**Archivos eliminados / reemplazados**
+
+| Antes | Ahora |
+|---|---|
+| `connection.php` (contraseña dentro del código) | `src/db.php` + variables de entorno |
+| `index.php` (registro) | `public/registro.php` (crea negocio + administrador) |
+| `registro.php` (viejo, roto: usaba la columna `correo`) | eliminado |
+| `home.php` + `dashboard.php` | `public/dashboard.php` (unificados) |
+| `inventory.php` / `sales.php` / `register-sale.php` / `reports.php` / `users.php` | `inventario.php` / `ventas.php` / `vender.php` + `src/sales.php` / `reportes.php` / `usuarios.php` |
+| `style.css` (tenía una etiqueta HTML adentro) y CSS repetido en cada archivo | `public/assets/css/app.css` único |
+| `conocenos.html`, `contacto.html`, `planes.html` (una frase cada uno) | secciones de `public/index.php` |
+| `controlshop.sql` (MySQL) | `database/schema.sql` + `database/datos_migrados.sql` |
+
+**Problemas que se corrigieron**
+
+- Las páginas usaban variables distintas (`$conn`, `$mysqli`, `$conexion`) y casi todas fallaban. Ahora hay una sola conexión (`db()`).
+- Ninguna página exigía iniciar sesión: cualquiera podía borrar productos o ver usuarios. Ahora todas lo exigen y se comprueba el rol en el servidor.
+- Login: mensaje único ("Usuario o contraseña incorrectos"), sesión regenerada, cierre de sesión real (antes "Salir" solo abría el login), token CSRF en todos los formularios.
+- Se quitó el "usuario de prueba" forzado en `sales.php` y `display_errors` activado en producción.
+- Stock: ahora se descuenta con una sola instrucción atómica (`UPDATE ... WHERE stock >= cantidad`), así dos ventas simultáneas no pueden dejarlo negativo. El precio se lee de la base al cobrar.
+- Borrar un producto con ventas fallaba por la clave foránea; ahora se **desactiva** (y se puede reactivar).
+- Enlaces rotos (`dashboard.html`, `ventas.php`, `usuarios.php`), etiquetas HTML sin cerrar y diseño no adaptable a celular.
+- Las tres etiquetas de estado del inventario eran del mismo color; ahora se distinguen.
+- Categorías `hogar`/`Hogar` duplicadas: se normalizan.
+
+**Decisiones que debes conocer**
+
+- "Ganancia total" se renombró **"Ingresos acumulados"** (es lo vendido, no la utilidad). "Clientes registrados" ya no existe: contaba usuarios del sistema, no clientes.
+- "Por agotarse" = stock ≤ 5 en todas las pantallas (antes el inventario usaba < 10 y el dashboard ≤ 5). Se cambia en `STOCK_BAJO`, archivo `src/helpers.php`.
+- Se quitó la "frase inspiradora" fija. La agenda de `home.php` se conserva como "Pendientes de hoy" (se guarda en el navegador de cada persona).
+- `planes.html` no tenía planes reales; no inventé precios.
+- El correo `contacto@controlshop.com` de la portada es el que ya tenías: cámbialo en `public/index.php` por uno real.
+
+## 3. Base de datos: de MySQL a PostgreSQL
+
+| MySQL | PostgreSQL |
+|---|---|
+| `AUTO_INCREMENT` | `generated by default as identity` |
+| `DATETIME` | `timestamptz` (con zona horaria) |
+| `CURDATE()`, `MONTH()`, `WEEK()` | `date_trunc('day'/'month'/'week', now())` |
+| `GROUP BY` permisivo | `GROUP BY` completo |
+| `mysqli` | PDO con `pdo_pgsql` |
+
+Esquema nuevo (4 tablas): `negocios` → `usuarios`, `productos`, `ventas`. Cambios respecto al original:
+`negocio_id` en todo (aislamiento entre negocios), `rol` y `activo` en usuarios, `activo` en productos,
+`UNIQUE` real en usuario y correo, claves foráneas compuestas (una venta no puede mezclar productos o
+vendedores de otro negocio), `CHECK` para impedir stock/precios negativos, e índices. Se eliminó la
+columna `vendedor` de ventas (nunca se usaba).
+
+## 4. Configurar Supabase (paso a paso)
+
+1. Entra a <https://supabase.com>, crea una cuenta y un **New project**. Elige región cercana y define la **contraseña de la base de datos**. Guárdala: Supabase no la vuelve a mostrar.
+2. Abre **SQL Editor → New query**, pega todo `database/schema.sql` y pulsa **Run**. Debe terminar sin errores.
+3. *(Opcional)* Para conservar tus datos antiguos, pega y ejecuta `database/datos_migrados.sql`. Verás al final una fila con `1, 3, 2, 7` (negocios, usuarios, productos, ventas). Entras con `pepe` (administrador); las contraseñas son las que ya tenías.
+4. Pulsa **Connect** (arriba) y elige **Session pooler**. Copia de ahí: host, puerto (5432), base (`postgres`) y usuario (`postgres.xxxx`). Usamos el *pooler* porque la conexión directa de Supabase puede ser solo IPv6 y Render necesita IPv4. *(Comprueba en la pantalla de Supabase que el pooler esté disponible en tu plan.)*
+
+**Copia de seguridad antes de migrar** (haz las dos):
+- En phpMyAdmin de Byethost: base `controlshop` → **Exportar** → método *Personalizado* → marca *Estructura y datos* → guarda el `.sql`. Ya tienes uno de junio de 2025 (`controlshop.sql`), pero si tu base en línea tiene datos más nuevos, exporta de nuevo y dime: tendré que regenerar `datos_migrados.sql`.
+- Guarda ese archivo en un lugar privado (no en GitHub).
+
+No se borra nada de MySQL: la migración solo **copia**. Mantén la base antigua hasta confirmar que todo funciona.
+
+## 5. Variables de entorno
+
+| Variable | Qué es |
+|---|---|
+| `DB_HOST` | host del *Session pooler* |
+| `DB_PORT` | `5432` |
+| `DB_NAME` | `postgres` |
+| `DB_USER` | `postgres.TU_ID_DE_PROYECTO` |
+| `DB_PASSWORD` | contraseña de la base (paso 1) |
+| `DB_SSLMODE` | `require` |
+| `APP_DEBUG` | `0` en producción; `1` solo en tu PC para ver errores |
+
+Nunca escribas estos valores en el código ni los subas a GitHub. En local van en `.env`; en Render, en su panel.
+
+## 6. Ejecutar y probar en tu computador
+
+Necesitas PHP 8.1 o superior con la extensión `pdo_pgsql`.
+(En XAMPP: abre `php.ini` y quita el `;` de `extension=pdo_pgsql` y `extension=pgsql`; reinicia.)
+
+```bash
+cp .env.example .env        # en Windows: copy .env.example .env
+# edita .env con los datos de Supabase y pon APP_DEBUG=1
+php -S localhost:8000 -t public
+```
+Abre <http://localhost:8000>. Para comprobar que PHP tiene la extensión: `php -m | grep pdo_pgsql`.
+
+Alternativa con Docker (igual que en Render):
+```bash
+docker build -t controlshop .
+docker run --rm -p 8080:10000 --env-file .env controlshop
+```
+Abre <http://localhost:8080>.
+
+## 7. Subir a GitHub y desplegar en Render
+
+**GitHub**
+```bash
+git init
+git add .
+git status                  # REVISA: no deben aparecer .env ni database/datos_migrados.sql
+git commit -m "ControlShop: PHP + Supabase"
+git branch -M main
+git remote add origin https://github.com/TU_USUARIO/controlshop.git
+git push -u origin main
+```
+(Crea antes el repositorio vacío en github.com. Si prefieres, hazlo privado.)
+
+**Render** (<https://render.com>)
+1. **New → Blueprint** (usa `render.yaml`) o **New → Web Service**, conecta tu repositorio y elige *Runtime: Docker*.
+2. Cuando pida las variables, rellena `DB_HOST`, `DB_USER` y `DB_PASSWORD` (las demás ya traen valor).
+3. Espera el *deploy*. Render te da una URL `https://....onrender.com`.
+4. Abre la URL, crea una cuenta y prueba.
+
+Cosas del plan gratuito a tener en cuenta (verifícalas en la documentación vigente): Render "duerme" el servicio tras un rato sin visitas y la primera carga tarda; Supabase puede pausar proyectos gratuitos muy inactivos. Las sesiones se guardan en archivos del contenedor, así que al reiniciarse el servicio la gente tendrá que volver a iniciar sesión.
+
+## 8. Pruebas
+
+**Realizadas (estáticas, en el entorno de preparación)**
+- Delimitadores `() [] {}` balanceados en todos los `.php`; sin llamadas a funciones propias inexistentes.
+- Todos los enlaces internos, `require` y `redirect` apuntan a archivos que existen.
+- `datos_migrados.sql` comparado por script con `controlshop.sql`: 3 hashes, 3 correos, 2 productos y 7 ventas idénticos.
+
+**Por hacer (necesitas ejecutar la app; no las pude correr yo)**
+1. Registrar un negocio → entra al inventario como administrador.
+2. Crear un producto, editarlo, desactivarlo y reactivarlo.
+3. Registrar una venta con 2 productos → el stock baja, aparece en Ventas y en el Resumen.
+4. Intentar vender más que el stock → debe mostrar error y no cambiar nada.
+5. Crear un empleado (menú Equipo) y entrar con él: no debe ver Reportes ni Equipo; escribir `/reportes.php` en la barra debe mostrar "Acceso restringido"; en Inventario no debe haber botones de editar.
+6. Registrar un segundo negocio con otro correo: no debe ver los productos ni ventas del primero.
+7. Desactivar al empleado → su sesión abierta debe dejar de funcionar.
+8. Con los datos migrados: entrar como `pepe` y revisar que se vean 2 productos y 7 líneas de venta.
+9. Abrir la app en el celular (o reducir la ventana): el menú debe abrirse con el botón ☰.
+10. Con una contraseña de base incorrecta en `.env`: debe verse "Base de datos no disponible", sin exponer detalles.
+
+**Pendientes / mejoras futuras**
+- Sin límite de intentos de login (fuerza bruta) ni recuperación de contraseña por correo; hoy un administrador puede cambiar la clave de sus empleados.
+- Sesiones en archivos (ver sección 7); lo ideal es guardarlas en la base de datos.
+- No hay pruebas automatizadas.
+- Una "venta" con varios productos se guarda como varias líneas con la misma fecha; para facturas más formales convendría una tabla de encabezado.
+- Cada administrador ve solo su negocio, pero no hay un "super administrador" de toda la plataforma.
+
+## 9. Seguridad: resumen
+
+- Sin secretos en el código; todo por variables de entorno.
+- La contraseña de PostgreSQL vive solo en el servidor; el navegador nunca la ve. Las contraseñas de usuarios se guardan con `password_hash` (bcrypt).
+- RLS activado en todas las tablas sin políticas públicas: la API pública de Supabase no puede leer ni escribir datos. Solo el servidor PHP.
+- Consultas con parámetros (contra inyección SQL), `htmlspecialchars` en toda salida (contra XSS), tokens CSRF, cookies `HttpOnly`/`SameSite`/`Secure`, y el rol y el negocio se verifican en el servidor en **cada** consulta.
+- **Cambia ya la contraseña de tu base en Byethost**: estuvo escrita en `connection.php` y compartida en un chat.
