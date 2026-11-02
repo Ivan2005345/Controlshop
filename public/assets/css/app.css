@@ -49,6 +49,8 @@ small.block { display: block; }
 .btn:hover { border-color: var(--steel); color: var(--ink); }
 .btn-primary { background: var(--steel); border-color: var(--steel); color: #fff; }
 .btn-primary:hover { background: var(--steel-dark); border-color: var(--steel-dark); color: #fff; }
+.btn-danger { color: var(--danger); border-color: #e3b3ad; }
+.btn-danger:hover { background: var(--danger-soft); border-color: var(--danger); color: var(--danger); }
 .btn-sm { padding: .3rem .7rem; font-size: .875rem; }
 .btn-lg { padding: .8rem 1.4rem; font-size: 1.05rem; }
 .btn-block { width: 100%; }
