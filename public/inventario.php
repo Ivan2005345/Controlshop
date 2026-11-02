@@ -14,7 +14,7 @@ if (is_post()) {
 
     if ($accion === 'guardar') {
         $id = filter_var($_POST['id'] ?? '', FILTER_VALIDATE_INT);
-        $nombre = post_string('nombre');
+        $nombre = (string) preg_replace('/\s+/u', ' ', post_string('nombre'));
         $categoria = normalize_category(post_string('categoria'));
         $precio = filter_var($_POST['precio'] ?? '', FILTER_VALIDATE_FLOAT);
         $stock = filter_var($_POST['stock'] ?? '', FILTER_VALIDATE_INT);
@@ -31,6 +31,22 @@ if (is_post()) {
         }
         if ($stock === false || $stock < 0 || $stock > 1000000) {
             $errores[] = 'El stock debe ser un número entero de 0 en adelante.';
+        }
+
+        // Evita productos repetidos: mismo nombre (sin importar mayúsculas), esté activo o desactivado.
+        if (!$errores) {
+            $repetido = db_row(
+                'SELECT nombre, CASE WHEN activo THEN 1 ELSE 0 END AS activo
+                   FROM productos
+                  WHERE negocio_id = :n AND lower(nombre) = lower(:nombre) AND id <> :id
+                  LIMIT 1',
+                [':n' => $negocio, ':nombre' => $nombre, ':id' => $id ?: 0]
+            );
+            if ($repetido) {
+                $errores[] = (int) $repetido['activo'] === 1
+                    ? "Ya existe un producto llamado «{$repetido['nombre']}». Edítalo para cambiar su precio o stock en lugar de crear otro."
+                    : "Ya existe «{$repetido['nombre']}», pero está desactivado. Usa «Ver inactivos» y reactívalo en lugar de crear otro.";
+            }
         }
 
         if ($errores) {
@@ -55,8 +71,12 @@ if (is_post()) {
                     flash('ok', 'Producto agregado al inventario.');
                 }
             } catch (PDOException $ex) {
-                error_log('[controlshop] Error al guardar producto: ' . $ex->getMessage());
-                flash('error', 'No se pudo guardar el producto. Inténtalo de nuevo.');
+                if ($ex->getCode() === '23505') { // la base de datos también impide los nombres repetidos
+                    flash('error', 'Ya existe un producto con ese nombre (puede estar desactivado).');
+                } else {
+                    error_log('[controlshop] Error al guardar producto: ' . $ex->getMessage());
+                    flash('error', 'No se pudo guardar el producto. Inténtalo de nuevo.');
+                }
             }
         }
     } elseif ($accion === 'estado') {
