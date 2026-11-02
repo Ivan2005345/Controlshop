@@ -86,6 +86,26 @@ if (is_post()) {
             db_exec('UPDATE productos SET activo = NOT activo WHERE id = :id AND negocio_id = :n', [':id' => $id, ':n' => $negocio]);
             flash('ok', 'Estado del producto actualizado.');
         }
+    } elseif ($accion === 'eliminar') {
+        // Solo se puede borrar de verdad un producto que NO tenga ventas registradas.
+        $id = filter_var($_POST['id'] ?? '', FILTER_VALIDATE_INT);
+        if ($id) {
+            $ventas = (int) db_val(
+                'SELECT COUNT(*) FROM ventas WHERE id_producto = :id AND negocio_id = :n',
+                [':id' => $id, ':n' => $negocio]
+            );
+            if ($ventas > 0) {
+                flash('error', "No se puede eliminar: el producto tiene $ventas venta(s) registradas y se perdería el historial. Desactívalo en su lugar.");
+            } else {
+                try {
+                    $filas = db_exec('DELETE FROM productos WHERE id = :id AND negocio_id = :n', [':id' => $id, ':n' => $negocio]);
+                    flash($filas ? 'ok' : 'error', $filas ? 'Producto eliminado definitivamente.' : 'No se encontró el producto.');
+                } catch (PDOException $ex) {
+                    error_log('[controlshop] Error al eliminar producto: ' . $ex->getMessage());
+                    flash('error', 'No se pudo eliminar el producto.');
+                }
+            }
+        }
     }
     redirect($volver);
 }
@@ -93,7 +113,8 @@ if (is_post()) {
 // ---------- Listado ----------
 $verInactivos = isset($_GET['inactivos']);
 $productos = db_all(
-    'SELECT id, nombre, categoria, precio, stock, CASE WHEN activo THEN 1 ELSE 0 END AS activo
+    'SELECT id, nombre, categoria, precio, stock, CASE WHEN activo THEN 1 ELSE 0 END AS activo,
+            (SELECT COUNT(*) FROM ventas v WHERE v.id_producto = productos.id) AS num_ventas
        FROM productos
       WHERE negocio_id = :n' . ($verInactivos ? '' : ' AND activo = true') . '
       ORDER BY nombre ASC',
@@ -166,6 +187,15 @@ page_start('Inventario', 'inventario.php', $user);
                     <?php if ($verInactivos): ?><input type="hidden" name="ver" value="1"><?php endif; ?>
                     <button class="btn btn-sm" type="submit"><?= $activo ? 'Desactivar' : 'Reactivar' ?></button>
                   </form>
+                  <?php if ((int) $p['num_ventas'] === 0): ?>
+                    <form method="post" class="inline" onsubmit="return confirm('¿Eliminar este producto definitivamente? Esta acción no se puede deshacer.');">
+                      <?= csrf_field() ?>
+                      <input type="hidden" name="accion" value="eliminar">
+                      <input type="hidden" name="id" value="<?= (int) $p['id'] ?>">
+                      <?php if ($verInactivos): ?><input type="hidden" name="ver" value="1"><?php endif; ?>
+                      <button class="btn btn-sm btn-danger" type="submit"><i class="fa-solid fa-trash"></i> Eliminar</button>
+                    </form>
+                  <?php endif; ?>
                 </td>
               <?php endif; ?>
             </tr>
