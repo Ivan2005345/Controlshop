@@ -298,6 +298,7 @@ dialog::backdrop { background: rgba(20, 35, 45, .5); }
   padding: 0; border-radius: var(--radius);
 }
 .theme-toggle-labeled { width: 100%; padding: .6rem .8rem; font-weight: 600; text-align: left; }
+.topbar .theme-toggle { margin-left: auto; }
 .theme-toggle-labeled:hover { background: var(--mist); }
 .theme-toggle-label { flex: 1; }
 

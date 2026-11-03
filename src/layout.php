@@ -23,7 +23,7 @@ function html_head(string $title): void
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  <link rel="stylesheet" href="assets/css/app.css">
+  <link rel="stylesheet" href="<?= e(asset('assets/css/app.css')) ?>">
 </head>
 <?php
 }
@@ -55,6 +55,7 @@ function page_start(string $title, string $active, array $user): void
       <i class="fa-solid fa-bars"></i>
     </button>
     <img src="assets/img/logo.png" alt="ControlShop" class="topbar-logo">
+    <?php theme_button(); ?>
   </header>
 
   <aside class="sidebar" id="sidebar">
@@ -91,7 +92,7 @@ function page_end(): void
 {
     ?>
   </main>
-  <script src="assets/js/app.js" defer></script>
+  <script src="<?= e(asset('assets/js/app.js')) ?>" defer></script>
 </body>
 </html>
 <?php
@@ -118,7 +119,7 @@ function auth_end(): void
     ?>
     </div>
   </main>
-  <script src="assets/js/app.js" defer></script>
+  <script src="<?= e(asset('assets/js/app.js')) ?>" defer></script>
 </body>
 </html>
 <?php
