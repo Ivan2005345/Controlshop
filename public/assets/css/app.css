@@ -312,12 +312,20 @@ dialog::backdrop { background: rgba(20, 35, 45, .5); }
   position: absolute; top: 2px; left: 2px;
   display: grid; place-items: center; width: 24px; height: 24px;
   border-radius: 50%; background: var(--surface); color: var(--steel);
-  font-size: .72rem; box-shadow: 0 1px 3px rgba(20, 35, 45, .28);
+  box-shadow: 0 1px 3px rgba(20, 35, 45, .28);
   transition: transform .25s cubic-bezier(.4, 0, .2, 1), background-color .25s ease, color .25s ease;
 }
+.theme-thumb svg { display: block; }
 :root[data-theme="dark"] .theme-track { background: var(--steel); border-color: var(--steel); }
 :root[data-theme="dark"] .theme-thumb { transform: translateX(26px); color: var(--tag); }
 
 .auth-panel { position: relative; }
 .auth-panel .theme-toggle { position: absolute; top: 1rem; right: 1rem; }
+.auth-panel .theme-toggle-labeled {
+  width: auto; padding: .35rem .45rem .35rem .8rem; gap: .5rem;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+  font-size: .8rem; box-shadow: 0 1px 2px rgba(20, 35, 45, .08);
+}
+.auth-panel .theme-toggle-labeled:hover { background: var(--hover); }
+.auth-panel .theme-toggle-label { flex: none; }
 .site-nav { align-items: center; }

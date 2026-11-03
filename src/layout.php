@@ -108,7 +108,7 @@ function auth_start(string $title): void
     <p>Tu inventario, tus ventas y tu equipo, en un solo lugar.</p>
   </section>
   <main class="auth-panel">
-    <?php theme_button(); ?>
+    <?php theme_button(true); ?>
     <div class="auth-box">
       <a href="index.php"><img class="auth-logo" src="assets/img/logo.png" alt="ControlShop"></a>
 <?php
@@ -133,7 +133,8 @@ function theme_button(bool $label = false): void
   <?php if ($label): ?><span class="theme-toggle-label"><span class="when-light">Modo oscuro</span><span class="when-dark">Modo claro</span></span><?php endif; ?>
   <span class="theme-track" aria-hidden="true">
     <span class="theme-thumb">
-      <i class="fa-solid fa-moon when-light"></i><i class="fa-solid fa-sun when-dark"></i>
+      <svg class="when-light" viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+      <svg class="when-dark" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
     </span>
   </span>
 </button>
