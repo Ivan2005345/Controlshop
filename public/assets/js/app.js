@@ -3,6 +3,16 @@
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
+  /* ---------- Modo claro / oscuro (la elección se recuerda en este navegador) ---------- */
+  const root = document.documentElement;
+  $$('[data-theme-toggle]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = next;
+      try { localStorage.setItem('cs_tema', next); } catch (err) { /* sin almacenamiento */ }
+    });
+  });
+
   /* ---------- Menú lateral en celular ---------- */
   const menuBtn = $('#menuBtn');
   const setMenu = (open) => {

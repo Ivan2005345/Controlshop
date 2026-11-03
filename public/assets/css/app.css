@@ -14,6 +14,17 @@
   --danger-soft: #fbe9e7;
   --ok: #2a6f47;
   --ok-soft: #e5f3ea;
+  --accent: #2f6b8f;
+  --accent-hover: #245673;
+  --field-border: #b9c7d1;
+  --hover: #f8fbfd;
+  --ok-line: #b9dcc7;
+  --danger-line: #e8b9b3;
+  --warn-text: #8a5a00;
+  --chip-off: #eceff1;
+  --ticket: #fffdf8;
+  --ticket-line: #e8dfcf;
+  --ticket-dash: #d9cdb6;
   --radius: 8px;
   --sidebar: 236px;
   --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
@@ -24,8 +35,8 @@
 html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; font-family: var(--font-body); color: var(--ink); background: var(--paper); line-height: 1.5; }
 img { max-width: 100%; display: block; }
-a { color: var(--steel); }
-a:hover { color: var(--steel-dark); }
+a { color: var(--accent); }
+a:hover { color: var(--accent-hover); }
 h1, h2 { font-family: var(--font-display); line-height: 1.15; margin: 0 0 .5rem; letter-spacing: -0.01em; }
 h1 { font-size: clamp(1.7rem, 3vw, 2.2rem); font-weight: 700; }
 h2 { font-size: 1.2rem; font-weight: 700; }
@@ -49,31 +60,31 @@ small.block { display: block; }
 .btn:hover { border-color: var(--steel); color: var(--ink); }
 .btn-primary { background: var(--steel); border-color: var(--steel); color: #fff; }
 .btn-primary:hover { background: var(--steel-dark); border-color: var(--steel-dark); color: #fff; }
-.btn-danger { color: var(--danger); border-color: #e3b3ad; }
+.btn-danger { color: var(--danger); border-color: var(--danger-line); }
 .btn-danger:hover { background: var(--danger-soft); border-color: var(--danger); color: var(--danger); }
 .btn-sm { padding: .3rem .7rem; font-size: .875rem; }
 .btn-lg { padding: .8rem 1.4rem; font-size: 1.05rem; }
 .btn-block { width: 100%; }
 .icon-btn { border: 0; background: none; color: var(--ink); font-size: 1.1rem; padding: .4rem .55rem; border-radius: var(--radius); cursor: pointer; }
 .icon-btn:hover { background: var(--mist); }
-.link-btn { border: 0; background: none; padding: 0; font: inherit; color: var(--steel); text-decoration: underline; cursor: pointer; }
+.link-btn { border: 0; background: none; padding: 0; font: inherit; color: var(--accent); text-decoration: underline; cursor: pointer; }
 
 .form { display: grid; gap: 1rem; }
 label { display: grid; gap: .35rem; font-weight: 600; font-size: .9rem; }
 .inline-label { display: inline-flex; align-items: center; gap: .5rem; }
 input, select {
   font: inherit; font-weight: 400; color: var(--ink); background: var(--surface);
-  padding: .6rem .75rem; border: 1px solid #b9c7d1; border-radius: var(--radius); min-width: 0;
+  padding: .6rem .75rem; border: 1px solid var(--field-border); border-radius: var(--radius); min-width: 0;
 }
-input:focus, select:focus { border-color: var(--steel); }
+input:focus, select:focus { border-color: var(--accent); }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 form.inline { display: inline; }
 .inline-form { display: flex; gap: .5rem; align-items: center; }
 .inline-form input { flex: 1; }
 
 .flash { padding: .75rem 1rem; border-radius: var(--radius); margin-bottom: 1.25rem; border: 1px solid; }
-.flash-ok { background: var(--ok-soft); border-color: #b9dcc7; color: var(--ok); }
-.flash-error { background: var(--danger-soft); border-color: #f0c4be; color: var(--danger); }
+.flash-ok { background: var(--ok-soft); border-color: var(--ok-line); color: var(--ok); }
+.flash-error { background: var(--danger-soft); border-color: var(--danger-line); color: var(--danger); }
 
 /* ---------- Estructura de la app ---------- */
 .sidebar {
@@ -89,10 +100,10 @@ form.inline { display: inline; }
   display: flex; align-items: center; gap: .7rem; width: 100%; padding: .6rem .8rem; border: 0; border-radius: var(--radius);
   background: none; color: var(--ink); font: inherit; font-weight: 600; text-decoration: none; cursor: pointer; text-align: left;
 }
-.nav-link i { width: 1.1rem; text-align: center; color: var(--steel); }
+.nav-link i { width: 1.1rem; text-align: center; color: var(--accent); }
 .nav-link:hover { background: var(--mist); color: var(--ink); }
 .nav-link[aria-current="page"] { background: var(--mist); box-shadow: inset 3px 0 0 var(--tag); }
-.logout { margin-top: auto; }
+.sidebar-foot { margin-top: auto; display: grid; gap: .2rem; }
 
 .topbar { display: none; }
 .scrim { display: none; }
@@ -127,7 +138,7 @@ form.inline { display: inline; }
 .bars { list-style: none; margin: 0; padding: 0; display: grid; gap: .6rem; }
 .bars li { display: grid; grid-template-columns: 3rem 1fr 6.5rem; gap: .75rem; align-items: center; font-size: .9rem; }
 .bar-track { background: var(--mist); border-radius: 999px; height: .6rem; overflow: hidden; }
-.bar { display: block; height: 100%; background: var(--steel); border-radius: 999px; }
+.bar { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
 .bar-value { text-align: right; font-variant-numeric: tabular-nums; }
 
 /* ---------- Tablas ---------- */
@@ -137,7 +148,7 @@ th, td { padding: .8rem 1rem; text-align: left; border-bottom: 1px solid var(--l
 thead th { font-size: .875rem; font-weight: 600; color: var(--muted); background: var(--mist); white-space: nowrap; }
 tbody tr:last-child td, tfoot th, tfoot td { border-bottom: 0; }
 tfoot th, tfoot td { background: var(--paper); }
-tbody tr:hover { background: #f8fbfd; }
+tbody tr:hover { background: var(--hover); }
 .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .actions { white-space: nowrap; text-align: right; }
 .actions > * { vertical-align: middle; }
@@ -145,9 +156,9 @@ tbody tr:hover { background: #f8fbfd; }
 
 .chip { display: inline-block; padding: .15rem .65rem; border-radius: 999px; font-size: .8rem; font-weight: 600; white-space: nowrap; }
 .chip-ok { background: var(--ok-soft); color: var(--ok); }
-.chip-low { background: var(--tag-soft); color: #8a5a00; }
+.chip-low { background: var(--tag-soft); color: var(--warn-text); }
 .chip-out { background: var(--danger-soft); color: var(--danger); }
-.chip-off { background: #eceff1; color: var(--muted); }
+.chip-off { background: var(--chip-off); color: var(--muted); }
 
 .pass-box { display: inline-block; margin-left: .25rem; text-align: left; }
 .pass-box summary { list-style: none; }
@@ -155,7 +166,7 @@ tbody tr:hover { background: #f8fbfd; }
 .pass-box[open] { display: block; margin: .5rem 0 0; }
 
 /* ---------- Diálogo ---------- */
-dialog { border: 0; border-radius: 12px; padding: 0; width: min(480px, 92vw); color: var(--ink); }
+dialog { border: 0; border-radius: 12px; padding: 0; width: min(480px, 92vw); color: var(--ink); background: var(--surface); }
 dialog::backdrop { background: rgba(20, 35, 45, .5); }
 .dialog-form { padding: 1.5rem; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: .75rem; margin-top: .5rem; }
@@ -163,20 +174,20 @@ dialog::backdrop { background: rgba(20, 35, 45, .5); }
 /* ---------- Venta: el carrito es un ticket ---------- */
 .sale-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 380px); gap: 2rem; align-items: start; }
 .ticket {
-  position: relative; background: #fffdf8; border: 1px solid #e8dfcf; border-bottom: 0;
+  position: relative; background: var(--ticket); border: 1px solid var(--ticket-line); border-bottom: 0;
   padding: 1.25rem 1.25rem 1.5rem; margin-bottom: 12px; font-variant-numeric: tabular-nums;
 }
 .ticket::after {
   content: ""; position: absolute; left: -1px; right: -1px; bottom: -11px; height: 11px;
-  background: radial-gradient(circle at 7px 11px, transparent 6px, #fffdf8 6.5px) repeat-x;
+  background: radial-gradient(circle at 7px 11px, transparent 6px, var(--ticket) 6.5px) repeat-x;
   background-size: 14px 11px;
 }
 .ticket h2 { margin-bottom: .1rem; }
-.ticket-meta { margin: 0 0 1rem; padding-bottom: 1rem; border-bottom: 2px dashed #d9cdb6; color: var(--muted); font-size: .85rem; }
+.ticket-meta { margin: 0 0 1rem; padding-bottom: 1rem; border-bottom: 2px dashed var(--ticket-dash); color: var(--muted); font-size: .85rem; }
 .ticket-lines { list-style: none; margin: 0; padding: 0; }
 .ticket-lines li { display: grid; grid-template-columns: 1fr auto auto; gap: .5rem; align-items: start; padding: .5rem 0; }
 .ticket-name small { display: block; }
-.ticket-total { display: flex; justify-content: space-between; align-items: baseline; margin: 1rem 0; padding-top: 1rem; border-top: 2px dashed #d9cdb6; font-size: 1.1rem; }
+.ticket-total { display: flex; justify-content: space-between; align-items: baseline; margin: 1rem 0; padding-top: 1rem; border-top: 2px dashed var(--ticket-dash); font-size: 1.1rem; }
 .ticket-total strong { font: 700 1.8rem var(--font-display); }
 .ticket-clear { text-align: center; margin-top: .75rem; font-size: .9rem; }
 
@@ -240,3 +251,46 @@ dialog::backdrop { background: rgba(20, 35, 45, .5); }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+/* ---------- Modo oscuro ---------- */
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #e6eef3;
+  --accent: #6bb4dd;
+  --accent-hover: #9acbe7;
+  --steel: #2f6b8f;
+  --steel-dark: #3a7ba3;
+  --mist: #223442;
+  --tag-soft: #3a2d14;
+  --paper: #121c23;
+  --surface: #1a2730;
+  --line: #2b3b46;
+  --muted: #9bb0bd;
+  --danger: #f0948b;
+  --danger-soft: #3a1f1c;
+  --ok: #7ccb9a;
+  --ok-soft: #17301f;
+  --field-border: #3d5160;
+  --hover: #1f2e38;
+  --ok-line: #2c5a3d;
+  --danger-line: #6b3a35;
+  --warn-text: #f2c373;
+  --chip-off: #2a3640;
+  --ticket: #1f2c35;
+  --ticket-line: #33444f;
+  --ticket-dash: #46596a;
+}
+/* El logo tiene trazos oscuros: en modo oscuro va sobre una etiqueta blanca */
+:root[data-theme="dark"] .brand img,
+:root[data-theme="dark"] .topbar-logo,
+:root[data-theme="dark"] .auth-logo,
+:root[data-theme="dark"] .site-logo { background: #fff; border-radius: 12px; padding: 6px; }
+:root[data-theme="dark"] .topbar-logo { height: 44px; }
+
+/* Botón de cambio de modo: muestra la luna en claro y el sol en oscuro */
+:root[data-theme="dark"] .when-light { display: none !important; }
+:root:not([data-theme="dark"]) .when-dark { display: none !important; }
+.auth-panel { position: relative; }
+.auth-panel .theme-toggle { position: absolute; top: 1rem; right: 1rem; }
+.site-nav { align-items: center; }

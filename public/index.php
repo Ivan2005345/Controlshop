@@ -13,6 +13,7 @@ html_head('Inventario y ventas para tu negocio');
   <header class="site-header">
     <a href="index.php"><img src="assets/img/logo.png" alt="ControlShop" class="site-logo"></a>
     <nav class="site-nav" aria-label="Cuenta">
+      <?php theme_button(); ?>
       <?php if ($conSesion): ?>
         <a class="btn btn-primary" href="dashboard.php">Ir a mi panel</a>
       <?php else: ?>
@@ -61,5 +62,6 @@ html_head('Inventario y ventas para tu negocio');
     <p><strong>ControlShop</strong> es una solución digital para que los negocios pequeños lleven su inventario y sus ventas en orden.</p>
     <p>¿Preguntas? Escríbenos a <a href="mailto:contacto@controlshop.com">contacto@controlshop.com</a></p>
   </footer>
+  <script src="assets/js/app.js" defer></script>
 </body>
 </html>

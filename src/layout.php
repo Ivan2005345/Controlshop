@@ -9,6 +9,14 @@ function html_head(string $title): void
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+    /* Se aplica antes de pintar la página para que no parpadee: elección guardada o modo del sistema */
+    try {
+      var t = localStorage.getItem('cs_tema');
+      if (t !== 'dark' && t !== 'light') { t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+      document.documentElement.dataset.theme = t;
+    } catch (e) {}
+  </script>
   <title><?= e($title) ?> · ControlShop</title>
   <link rel="icon" href="assets/img/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -62,10 +70,13 @@ function page_start(string $title, string $active, array $user): void
         </a>
       <?php endforeach; ?>
     </nav>
-    <form method="post" action="logout.php" class="logout">
-      <?= csrf_field() ?>
-      <button class="nav-link" type="submit"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
-    </form>
+    <div class="sidebar-foot">
+      <?php theme_button(true); ?>
+      <form method="post" action="logout.php">
+        <?= csrf_field() ?>
+        <button class="nav-link" type="submit"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
+      </form>
+    </div>
   </aside>
   <div class="scrim" id="scrim"></div>
 
@@ -96,6 +107,7 @@ function auth_start(string $title): void
     <p>Tu inventario, tus ventas y tu equipo, en un solo lugar.</p>
   </section>
   <main class="auth-panel">
+    <?php theme_button(); ?>
     <div class="auth-box">
       <a href="index.php"><img class="auth-logo" src="assets/img/logo.png" alt="ControlShop"></a>
 <?php
@@ -106,7 +118,19 @@ function auth_end(): void
     ?>
     </div>
   </main>
+  <script src="assets/js/app.js" defer></script>
 </body>
 </html>
+<?php
+}
+
+/** Botón para cambiar entre modo claro y oscuro. Con $label=true lleva texto (menú lateral). */
+function theme_button(bool $label = false): void
+{
+    ?>
+<button class="<?= $label ? 'nav-link' : 'icon-btn theme-toggle' ?>" type="button" data-theme-toggle aria-label="Cambiar entre modo claro y modo oscuro">
+  <i class="fa-solid fa-moon when-light"></i><i class="fa-solid fa-sun when-dark"></i>
+  <?php if ($label): ?><span class="when-light">Modo oscuro</span><span class="when-dark">Modo claro</span><?php endif; ?>
+</button>
 <?php
 }
