@@ -5,13 +5,20 @@
 
   /* ---------- Modo claro / oscuro (la elección se recuerda en este navegador) ---------- */
   const root = document.documentElement;
-  $$('[data-theme-toggle]').forEach((btn) => {
+  const themeToggles = $$('[data-theme-toggle]');
+  const syncTheme = () => {
+    const dark = root.dataset.theme === 'dark';
+    themeToggles.forEach((btn) => btn.setAttribute('aria-checked', String(dark)));
+  };
+  themeToggles.forEach((btn) => {
     btn.addEventListener('click', () => {
       const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
       root.dataset.theme = next;
       try { localStorage.setItem('cs_tema', next); } catch (err) { /* sin almacenamiento */ }
+      syncTheme();
     });
   });
+  syncTheme();
 
   /* ---------- Menú lateral en celular ---------- */
   const menuBtn = $('#menuBtn');

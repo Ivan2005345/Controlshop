@@ -128,9 +128,13 @@ function auth_end(): void
 function theme_button(bool $label = false): void
 {
     ?>
-<button class="<?= $label ? 'nav-link' : 'icon-btn theme-toggle' ?>" type="button" data-theme-toggle aria-label="Cambiar entre modo claro y modo oscuro">
-  <i class="fa-solid fa-moon when-light"></i><i class="fa-solid fa-sun when-dark"></i>
-  <?php if ($label): ?><span class="when-light">Modo oscuro</span><span class="when-dark">Modo claro</span><?php endif; ?>
+<button class="theme-toggle<?= $label ? ' theme-toggle-labeled' : '' ?>" type="button" data-theme-toggle role="switch" aria-checked="false" aria-label="Cambiar entre modo claro y modo oscuro">
+  <?php if ($label): ?><span class="theme-toggle-label"><span class="when-light">Modo oscuro</span><span class="when-dark">Modo claro</span></span><?php endif; ?>
+  <span class="theme-track" aria-hidden="true">
+    <span class="theme-thumb">
+      <i class="fa-solid fa-moon when-light"></i><i class="fa-solid fa-sun when-dark"></i>
+    </span>
+  </span>
 </button>
 <?php
 }

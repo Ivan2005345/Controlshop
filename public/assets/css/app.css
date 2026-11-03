@@ -288,9 +288,35 @@ dialog::backdrop { background: rgba(20, 35, 45, .5); }
 :root[data-theme="dark"] .site-logo { background: #fff; border-radius: 12px; padding: 6px; }
 :root[data-theme="dark"] .topbar-logo { height: 44px; }
 
-/* Botón de cambio de modo: muestra la luna en claro y el sol en oscuro */
+/* Botón de cambio de modo: un interruptor que se desliza al cambiar */
 :root[data-theme="dark"] .when-light { display: none !important; }
 :root:not([data-theme="dark"]) .when-dark { display: none !important; }
+
+.theme-toggle {
+  display: inline-flex; align-items: center; gap: .75rem;
+  border: 0; background: none; color: var(--ink); font: inherit; cursor: pointer;
+  padding: 0; border-radius: var(--radius);
+}
+.theme-toggle-labeled { width: 100%; padding: .6rem .8rem; font-weight: 600; text-align: left; }
+.theme-toggle-labeled:hover { background: var(--mist); }
+.theme-toggle-label { flex: 1; }
+
+.theme-track {
+  position: relative; flex: none; display: block;
+  width: 54px; height: 30px; border-radius: 999px;
+  background: var(--mist); border: 1px solid var(--field-border);
+  transition: background-color .25s ease, border-color .25s ease;
+}
+.theme-thumb {
+  position: absolute; top: 2px; left: 2px;
+  display: grid; place-items: center; width: 24px; height: 24px;
+  border-radius: 50%; background: var(--surface); color: var(--steel);
+  font-size: .72rem; box-shadow: 0 1px 3px rgba(20, 35, 45, .28);
+  transition: transform .25s cubic-bezier(.4, 0, .2, 1), background-color .25s ease, color .25s ease;
+}
+:root[data-theme="dark"] .theme-track { background: var(--steel); border-color: var(--steel); }
+:root[data-theme="dark"] .theme-thumb { transform: translateX(26px); color: var(--tag); }
+
 .auth-panel { position: relative; }
 .auth-panel .theme-toggle { position: absolute; top: 1rem; right: 1rem; }
 .site-nav { align-items: center; }
