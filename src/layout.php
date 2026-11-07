@@ -23,7 +23,7 @@ function html_head(string $title): void
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  <link rel="stylesheet" href="<?= e(asset('assets/css/app.css')) ?>">
+  <link rel="stylesheet" href="assets/css/app.css">
 </head>
 <?php
 }
@@ -55,7 +55,6 @@ function page_start(string $title, string $active, array $user): void
       <i class="fa-solid fa-bars"></i>
     </button>
     <img src="assets/img/logo.png" alt="ControlShop" class="topbar-logo">
-    <?php theme_button(); ?>
   </header>
 
   <aside class="sidebar" id="sidebar">
@@ -92,7 +91,7 @@ function page_end(): void
 {
     ?>
   </main>
-  <script src="<?= e(asset('assets/js/app.js')) ?>" defer></script>
+  <script src="assets/js/app.js" defer></script>
 </body>
 </html>
 <?php
@@ -108,7 +107,7 @@ function auth_start(string $title): void
     <p>Tu inventario, tus ventas y tu equipo, en un solo lugar.</p>
   </section>
   <main class="auth-panel">
-    <?php theme_button(true); ?>
+    <?php theme_button(); ?>
     <div class="auth-box">
       <a href="index.php"><img class="auth-logo" src="assets/img/logo.png" alt="ControlShop"></a>
 <?php
@@ -119,23 +118,20 @@ function auth_end(): void
     ?>
     </div>
   </main>
-  <script src="<?= e(asset('assets/js/app.js')) ?>" defer></script>
+  <script src="assets/js/app.js" defer></script>
 </body>
 </html>
 <?php
 }
 
-/** Botón para cambiar entre modo claro y oscuro. Con $label=true lleva texto (menú lateral). */
+/** Interruptor deslizable de modo claro/oscuro. Con $label=true muestra el texto (menú lateral). */
 function theme_button(bool $label = false): void
 {
     ?>
-<button class="theme-toggle<?= $label ? ' theme-toggle-labeled' : '' ?>" type="button" data-theme-toggle role="switch" aria-checked="false" aria-label="Cambiar entre modo claro y modo oscuro">
-  <?php if ($label): ?><span class="theme-toggle-label"><span class="when-light">Modo oscuro</span><span class="when-dark">Modo claro</span></span><?php endif; ?>
+<button class="theme-switch<?= $label ? ' with-label' : '' ?>" type="button" role="switch" aria-checked="false" data-theme-toggle aria-label="Modo oscuro">
+  <?php if ($label): ?><span>Modo oscuro</span><?php endif; ?>
   <span class="theme-track" aria-hidden="true">
-    <span class="theme-thumb">
-      <svg class="when-light" viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
-      <svg class="when-dark" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-    </span>
+    <span class="theme-knob"><i class="fa-solid fa-sun theme-sun"></i><i class="fa-solid fa-moon theme-moon"></i></span>
   </span>
 </button>
 <?php

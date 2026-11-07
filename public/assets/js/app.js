@@ -5,20 +5,21 @@
 
   /* ---------- Modo claro / oscuro (la elección se recuerda en este navegador) ---------- */
   const root = document.documentElement;
-  const themeToggles = $$('[data-theme-toggle]');
-  const syncTheme = () => {
-    const dark = root.dataset.theme === 'dark';
-    themeToggles.forEach((btn) => btn.setAttribute('aria-checked', String(dark)));
-  };
-  themeToggles.forEach((btn) => {
-    btn.addEventListener('click', () => {
+  const switches = $$('[data-theme-toggle]');
+  const syncSwitches = () => switches.forEach((sw) => sw.setAttribute('aria-checked', String(root.dataset.theme === 'dark')));
+  let animTimer;
+  switches.forEach((sw) => {
+    sw.addEventListener('click', () => {
       const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      root.classList.add('theme-anim'); // activa la transición suave de colores
       root.dataset.theme = next;
       try { localStorage.setItem('cs_tema', next); } catch (err) { /* sin almacenamiento */ }
-      syncTheme();
+      syncSwitches();
+      clearTimeout(animTimer);
+      animTimer = setTimeout(() => root.classList.remove('theme-anim'), 600);
     });
   });
-  syncTheme();
+  syncSwitches();
 
   /* ---------- Menú lateral en celular ---------- */
   const menuBtn = $('#menuBtn');

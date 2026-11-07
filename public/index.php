@@ -62,6 +62,6 @@ html_head('Inventario y ventas para tu negocio');
     <p><strong>ControlShop</strong> es una solución digital para que los negocios pequeños lleven su inventario y sus ventas en orden.</p>
     <p>¿Preguntas? Escríbenos a <a href="mailto:contacto@controlshop.com">contacto@controlshop.com</a></p>
   </footer>
-  <script src="<?= e(asset('assets/js/app.js')) ?>" defer></script>
+  <script src="assets/js/app.js" defer></script>
 </body>
 </html>
