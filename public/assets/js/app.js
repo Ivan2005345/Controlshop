@@ -3,6 +3,29 @@
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
+  /* ---------- Ojito para mostrar / ocultar contraseñas ---------- */
+  $$('input[type="password"]').forEach((input) => {
+    const wrap = document.createElement('span');
+    wrap.className = 'pw-field';
+    input.parentNode.insertBefore(wrap, input);
+    wrap.append(input);
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pw-toggle';
+    btn.setAttribute('aria-label', 'Mostrar contraseña');
+    btn.setAttribute('aria-pressed', 'false');
+    btn.innerHTML = '<i class="fa-solid fa-eye" aria-hidden="true"></i>';
+    btn.addEventListener('click', () => {
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      btn.setAttribute('aria-pressed', String(show));
+      btn.setAttribute('aria-label', show ? 'Ocultar contraseña' : 'Mostrar contraseña');
+      btn.querySelector('i').className = show ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+    });
+    wrap.append(btn);
+  });
+
   /* ---------- Modo claro / oscuro (la elección se recuerda en este navegador) ---------- */
   const root = document.documentElement;
   const switches = $$('[data-theme-toggle]');

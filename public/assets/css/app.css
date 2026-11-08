@@ -325,3 +325,14 @@ dialog::backdrop { background: rgba(20, 35, 45, .5); }
 :root[data-theme="dark"] .theme-switch .theme-knob { transform: translateX(24px); background: #e6eef3; }
 :root[data-theme="dark"] .theme-switch .theme-sun { opacity: 0; transform: rotate(120deg) scale(.3); }
 :root[data-theme="dark"] .theme-switch .theme-moon { opacity: 1; transform: rotate(0) scale(1); }
+
+/* ---------- Ojito de contraseña ---------- */
+.pw-field { position: relative; display: block; min-width: 0; }
+.pw-field input { width: 100%; padding-right: 2.75rem; }
+.inline-form .pw-field { flex: 1; }
+.pw-toggle {
+  position: absolute; top: 50%; right: .3rem; transform: translateY(-50%);
+  display: grid; place-items: center; width: 2.1rem; height: 2.1rem; border: 0; border-radius: 6px;
+  background: none; color: var(--muted); font-size: 1rem; cursor: pointer;
+}
+.pw-toggle:hover { color: var(--ink); background: var(--mist); }
