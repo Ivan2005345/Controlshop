@@ -4,6 +4,14 @@
 /** Un producto con stock igual o menor a este número se considera "por agotarse". */
 const STOCK_BAJO = 5;
 
+/** Métodos de pago permitidos: clave guardada en la base => texto que se muestra. */
+const METODOS_PAGO = [
+    'efectivo' => 'Efectivo',
+    'nequi' => 'Nequi',
+    'transferencia' => 'Transferencia',
+    'llave' => 'Llave',
+];
+
 /** Escapa texto para mostrarlo en HTML (evita XSS). Úsalo SIEMPRE al imprimir datos. */
 function e($value): string
 {
@@ -14,14 +22,6 @@ function e($value): string
 function money($amount): string
 {
     return '$' . number_format((float) $amount, 0, ',', '.');
-}
-
-/** URL de un archivo de /public con ?v=fecha: obliga al navegador a bajar la versión nueva. */
-function asset(string $path): string
-{
-    $file = ROOT_DIR . '/public/' . $path;
-    $version = is_file($file) ? filemtime($file) : 0;
-    return $path . ($version ? '?v=' . $version : '');
 }
 
 function redirect(string $path): never
@@ -100,7 +100,7 @@ function error_page(string $title, string $message): never
     echo '<!DOCTYPE html><html lang="es"><head><meta charset="utf-8">'
         . '<meta name="viewport" content="width=device-width, initial-scale=1">'
         . '<title>' . e($title) . ' · ControlShop</title>'
-        . '<link rel="stylesheet" href="' . e(asset('assets/css/app.css')) . '"></head>'
+        . '<link rel="stylesheet" href="assets/css/app.css"></head>'
         . '<body class="error-body"><main class="error-box">'
         . '<h1>' . e($title) . '</h1><p>' . e($message) . '</p>'
         . '<p><a class="btn btn-primary" href="index.php">Volver al inicio</a></p>'

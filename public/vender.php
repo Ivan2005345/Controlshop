@@ -41,9 +41,10 @@ if (is_post()) {
         $_SESSION['carrito'] = [];
     } elseif ($accion === 'cobrar') {
         try {
-            $total = registrar_venta($negocio, $user['id'], $_SESSION['carrito']);
+            $metodo = post_string('metodo_pago');
+            $total = registrar_venta($negocio, $user['id'], $_SESSION['carrito'], $metodo);
             $_SESSION['carrito'] = [];
-            flash('ok', 'Venta registrada por ' . money($total) . '.');
+            flash('ok', 'Venta registrada por ' . money($total) . ' (' . METODOS_PAGO[$metodo] . ').');
         } catch (RuntimeException $ex) {
             flash('error', $ex->getMessage()); // el carrito se conserva para corregirlo
         } catch (PDOException $ex) {
@@ -140,6 +141,17 @@ page_start('Nueva venta', 'vender.php', $user);
           <form method="post">
             <?= csrf_field() ?>
             <input type="hidden" name="accion" value="cobrar">
+            <fieldset class="pay-methods">
+              <legend>Método de pago</legend>
+              <div class="pay-grid">
+                <?php foreach (METODOS_PAGO as $clave => $nombre): ?>
+                  <label class="pay-option">
+                    <input type="radio" name="metodo_pago" value="<?= e($clave) ?>"<?= $clave === 'efectivo' ? ' checked' : '' ?>>
+                    <span><?= e($nombre) ?></span>
+                  </label>
+                <?php endforeach; ?>
+              </div>
+            </fieldset>
             <button class="btn btn-primary btn-block" type="submit"><i class="fa-solid fa-check"></i> Cobrar y registrar</button>
           </form>
           <form method="post" class="ticket-clear">

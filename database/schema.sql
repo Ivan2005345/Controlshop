@@ -39,6 +39,9 @@ create table public.productos (
   unique (id, negocio_id)
 );
 create index productos_negocio_idx on public.productos (negocio_id, activo);
+-- No se permiten dos productos con el mismo nombre en un negocio (sin distinguir mayúsculas),
+-- estén activos o desactivados.
+create unique index productos_negocio_nombre_uq on public.productos (negocio_id, lower(nombre));
 
 -- Cada fila es una línea de venta (un producto dentro de un cobro). Las líneas de un mismo cobro
 -- comparten la misma fecha y el mismo vendedor.
@@ -50,6 +53,8 @@ create table public.ventas (
   cantidad         integer       not null check (cantidad > 0),
   precio_unitario  numeric(10,2) not null check (precio_unitario >= 0),  -- precio al momento de vender
   fecha            timestamptz   not null default now(),
+  metodo_pago      varchar(20)   not null default 'efectivo'
+                   check (metodo_pago in ('efectivo', 'nequi', 'transferencia', 'llave')),
   -- Claves compuestas: garantizan que el producto y el vendedor sean del MISMO negocio que la venta.
   foreign key (id_producto, negocio_id) references public.productos (id, negocio_id),
   foreign key (id_usuario,  negocio_id) references public.usuarios  (id, negocio_id)

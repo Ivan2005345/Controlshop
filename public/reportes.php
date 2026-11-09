@@ -33,6 +33,18 @@ $categoriaTop = db_row(
     $n
 );
 
+// Ingresos del mes según cómo pagaron los clientes
+$porMetodo = db_all(
+    "SELECT metodo_pago, SUM(cantidad * precio_unitario) AS total
+       FROM ventas WHERE negocio_id = :n AND fecha >= date_trunc('month', now())
+      GROUP BY metodo_pago ORDER BY total DESC",
+    $n
+);
+$maxMetodo = 0.0;
+foreach ($porMetodo as $m) {
+    $maxMetodo = max($maxMetodo, (float) $m['total']);
+}
+
 // Ingresos de los últimos 7 días (los días sin ventas aparecen en 0)
 $dias = db_all(
     "SELECT to_char(d, 'DD/MM') AS dia, COALESCE(SUM(v.cantidad * v.precio_unitario), 0) AS total
@@ -81,4 +93,22 @@ page_start('Reportes', 'reportes.php', $user);
         </dl>
       </section>
     </div>
+
+    <section class="panel panel-gap">
+      <h2>Ingresos del mes por método de pago</h2>
+      <?php if (!$porMetodo): ?>
+        <p class="empty">Todavía no hay ventas este mes.</p>
+      <?php else: ?>
+        <ul class="bars bars-wide">
+          <?php foreach ($porMetodo as $m):
+              $ancho = $maxMetodo > 0 ? round(((float) $m['total'] / $maxMetodo) * 100) : 0; ?>
+            <li>
+              <span class="bar-label"><?= e(METODOS_PAGO[$m['metodo_pago']] ?? $m['metodo_pago']) ?></span>
+              <span class="bar-track"><span class="bar" style="width: <?= (int) $ancho ?>%"></span></span>
+              <span class="bar-value"><?= e(money($m['total'])) ?></span>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      <?php endif; ?>
+    </section>
 <?php page_end(); ?>

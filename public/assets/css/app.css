@@ -336,3 +336,18 @@ dialog::backdrop { background: rgba(20, 35, 45, .5); }
   background: none; color: var(--muted); font-size: 1rem; cursor: pointer;
 }
 .pw-toggle:hover { color: var(--ink); background: var(--mist); }
+
+/* ---------- Método de pago ---------- */
+.panel-gap { margin-top: 1.5rem; }
+.bars-wide li { grid-template-columns: 7.5rem 1fr 6.5rem; }
+.pay-methods { border: 0; padding: 0; margin: 0 0 1rem; min-width: 0; }
+.pay-methods legend { padding: 0; margin-bottom: .45rem; font-size: .85rem; font-weight: 600; color: var(--muted); }
+.pay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.pay-option { position: relative; display: block; }
+.pay-option input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; opacity: 0; cursor: pointer; }
+.pay-option span {
+  display: block; padding: .55rem .5rem; text-align: center; font-size: .9rem; font-weight: 600;
+  border: 1px solid var(--field-border); border-radius: var(--radius); background: var(--surface);
+}
+.pay-option input:checked + span { border-color: var(--steel); background: var(--mist); box-shadow: inset 0 0 0 1px var(--steel); }
+.pay-option input:focus-visible + span { outline: 3px solid var(--tag); outline-offset: 2px; }

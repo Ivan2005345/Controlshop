@@ -23,6 +23,12 @@ $ventasHoy = (int) db_val(
 $ingresosHoy = (float) db_val("SELECT $suma FROM ventas WHERE $filtro AND fecha >= date_trunc('day', now())", $params);
 $ingresosMes = (float) db_val("SELECT $suma FROM ventas WHERE $filtro AND fecha >= date_trunc('month', now())", $params);
 $ingresosTotal = (float) db_val("SELECT $suma FROM ventas WHERE $filtro", $params);
+$cobrosHoy = db_all(
+    "SELECT metodo_pago, $suma AS total FROM ventas
+      WHERE $filtro AND fecha >= date_trunc('day', now())
+      GROUP BY metodo_pago ORDER BY total DESC",
+    $params
+);
 
 $productos = (int) db_val('SELECT COUNT(*) FROM productos WHERE negocio_id = :n AND activo = true', [':n' => $negocio]);
 $totalBajos = (int) db_val(
@@ -91,4 +97,17 @@ page_start('Resumen', 'dashboard.php', $user);
         <p class="hint">Los pendientes se guardan solo en este navegador.</p>
       </section>
     </div>
+
+    <section class="panel panel-gap">
+      <h2>Cobros de hoy por método de pago</h2>
+      <?php if (!$cobrosHoy): ?>
+        <p class="empty">Todavía no hay ventas hoy.</p>
+      <?php else: ?>
+        <ul class="plain-list">
+          <?php foreach ($cobrosHoy as $c): ?>
+            <li><span><?= e(METODOS_PAGO[$c['metodo_pago']] ?? $c['metodo_pago']) ?></span><strong><?= e(money($c['total'])) ?></strong></li>
+          <?php endforeach; ?>
+        </ul>
+      <?php endif; ?>
+    </section>
 <?php page_end(); ?>

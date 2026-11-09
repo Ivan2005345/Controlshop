@@ -6,13 +6,17 @@
 
 /**
  * @param array<int,int> $carrito  [id_producto => cantidad]
+ * @param string $metodo  clave de METODOS_PAGO (efectivo, nequi, transferencia, llave)
  * @return float total de la venta
  * @throws RuntimeException con un mensaje apto para mostrar al usuario
  */
-function registrar_venta(int $negocioId, int $usuarioId, array $carrito): float
+function registrar_venta(int $negocioId, int $usuarioId, array $carrito, string $metodo = 'efectivo'): float
 {
     if (!$carrito) {
         throw new RuntimeException('El carrito está vacío.');
+    }
+    if (!array_key_exists($metodo, METODOS_PAGO)) {
+        throw new RuntimeException('Elige un método de pago válido.');
     }
 
     $pdo = db();
@@ -43,10 +47,10 @@ function registrar_venta(int $negocioId, int $usuarioId, array $carrito): float
 
             // El precio se toma de la base de datos al cobrar, no de lo que el navegador envió.
             $ins = $pdo->prepare(
-                'INSERT INTO ventas (negocio_id, id_producto, id_usuario, cantidad, precio_unitario)
-                 VALUES (:n, :p, :u, :c, :pr)'
+                'INSERT INTO ventas (negocio_id, id_producto, id_usuario, cantidad, precio_unitario, metodo_pago)
+                 VALUES (:n, :p, :u, :c, :pr, :m)'
             );
-            $ins->execute([':n' => $negocioId, ':p' => $productoId, ':u' => $usuarioId, ':c' => $cantidad, ':pr' => $precio]);
+            $ins->execute([':n' => $negocioId, ':p' => $productoId, ':u' => $usuarioId, ':c' => $cantidad, ':pr' => $precio, ':m' => $metodo]);
 
             $total += $cantidad * (float) $precio;
         }
