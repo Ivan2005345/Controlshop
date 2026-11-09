@@ -156,7 +156,24 @@ page_start('Nueva venta', 'vender.php', $user);
                 <?php endforeach; ?>
               </div>
             </fieldset>
-            <button class="btn btn-primary btn-block" type="submit"><i class="fa-solid fa-check"></i> Cobrar y registrar</button>
+
+            <div class="cash" id="cashPanel" data-total="<?= e(number_format($total, 2, '.', '')) ?>">
+              <div class="cash-inner">
+                <label class="cash-field" for="pagaCon">El cliente paga con
+                  <span class="cash-input">
+                    <span class="cash-sign">$</span>
+                    <input type="text" id="pagaCon" inputmode="numeric" autocomplete="off" placeholder="0">
+                  </span>
+                </label>
+                <div class="cash-quick" id="cashQuick" aria-label="Montos rápidos"></div>
+                <div class="cash-result" id="cashResult" data-state="idle" aria-live="polite">
+                  <span class="cash-label" id="cashLabel">Escribe cuánto paga el cliente</span>
+                  <strong class="cash-amount" id="cashAmount"></strong>
+                  <div class="cash-break" id="cashBreak"></div>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-block" id="btnCobrar" type="submit"><i class="fa-solid fa-check"></i> Cobrar y registrar</button>
           </form>
           <form method="post" class="ticket-clear">
             <?= csrf_field() ?>
