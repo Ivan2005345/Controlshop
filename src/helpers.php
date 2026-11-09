@@ -12,6 +12,25 @@ const METODOS_PAGO = [
     'llave' => 'Llave',
 ];
 
+/** Icono (Font Awesome) de cada método de pago. */
+const ICONOS_PAGO = [
+    'efectivo' => 'fa-money-bill-wave',
+    'nequi' => 'fa-mobile-screen-button',
+    'transferencia' => 'fa-building-columns',
+    'llave' => 'fa-key',
+];
+
+/**
+ * Ruta de un archivo de /public con ?v=fecha-de-modificación.
+ * Así, cada vez que cambia el CSS o el JS, el navegador descarga la versión nueva
+ * en vez de usar una guardada (por eso a veces no se veían los cambios).
+ */
+function asset(string $path): string
+{
+    $mtime = @filemtime(ROOT_DIR . '/public/' . $path);
+    return $path . '?v=' . ($mtime ?: 1);
+}
+
 /** Escapa texto para mostrarlo en HTML (evita XSS). Úsalo SIEMPRE al imprimir datos. */
 function e($value): string
 {

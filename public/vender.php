@@ -147,7 +147,11 @@ page_start('Nueva venta', 'vender.php', $user);
                 <?php foreach (METODOS_PAGO as $clave => $nombre): ?>
                   <label class="pay-option">
                     <input type="radio" name="metodo_pago" value="<?= e($clave) ?>"<?= $clave === 'efectivo' ? ' checked' : '' ?>>
-                    <span><?= e($nombre) ?></span>
+                    <span class="pay-card">
+                      <i class="fa-solid <?= e(ICONOS_PAGO[$clave] ?? 'fa-wallet') ?> pay-icon" aria-hidden="true"></i>
+                      <span class="pay-name"><?= e($nombre) ?></span>
+                      <i class="fa-solid fa-circle-check pay-check" aria-hidden="true"></i>
+                    </span>
                   </label>
                 <?php endforeach; ?>
               </div>
