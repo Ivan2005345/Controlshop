@@ -87,10 +87,14 @@ function page_start(string $title, string $active, array $user): void
 <?php
 }
 
-function page_end(): void
+/** Cierra una página interna. $scripts: archivos JS extra que solo esa página necesita (se cargan antes de app.js). */
+function page_end(array $scripts = []): void
 {
     ?>
   </main>
+<?php foreach ($scripts as $src): ?>
+  <script src="<?= e($src) ?>" defer></script>
+<?php endforeach; ?>
   <script src="<?= e(asset('assets/js/app.js')) ?>" defer></script>
 </body>
 </html>
