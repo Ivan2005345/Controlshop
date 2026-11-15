@@ -18,7 +18,7 @@
 
   const $id = (id) => document.getElementById(id);
   const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduced = false;
   const peso = (n) => '$' + String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   const corto = (n) => {
     if (n >= 1e6) return '$' + String(Math.round(n / 1e5) / 10).replace('.', ',') + ' M';
