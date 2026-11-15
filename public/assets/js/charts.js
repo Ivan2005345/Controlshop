@@ -1,207 +1,220 @@
-/* Gráficas interactivas de Reportes (usa Chart.js; esta página lo carga antes que este archivo). */
-(() => {
-  'use strict';
+document.addEventListener('DOMContentLoaded', () => {
   const dataEl = document.getElementById('chartData');
-  if (!dataEl) return;
+  if (!dataEl || typeof Chart === 'undefined') return;
 
-  // Si la librería no cargó (sin internet o bloqueada), se avisa en vez de dejar cajas vacías
-  if (!window.Chart) {
-    document.querySelectorAll('.chart-box').forEach((box) => {
-      box.textContent = 'No se pudieron cargar las gráficas. Revisa tu conexión y recarga la página.';
-      box.classList.add('chart-fail');
-    });
+  let data;
+  try {
+    data = JSON.parse(dataEl.textContent);
+  } catch (e) {
+    console.error('Error leyendo chartData:', e);
     return;
   }
 
-  let data;
-  try { data = JSON.parse(dataEl.textContent); } catch (err) { return; }
+  const fmtCOP = (val) =>
+    new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      maximumFractionDigits: 0,
+    }).format(val || 0);
 
-  const $id = (id) => document.getElementById(id);
-  const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const peso = (n) => '$' + String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  const corto = (n) => {
-    if (n >= 1e6) return '$' + String(Math.round(n / 1e5) / 10).replace('.', ',') + ' M';
-    if (n >= 1e3) return '$' + Math.round(n / 1e3) + ' mil';
-    return '$' + n;
+  const fmtFecha = (iso) => {
+    const [, m, d] = iso.split('-');
+    const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    return `${parseInt(d, 10)} ${meses[parseInt(m, 10) - 1] || m}`;
   };
-  const fecha = (iso, opts) => new Date(iso + 'T12:00:00').toLocaleDateString('es-CO', opts);
-  const withAlpha = (hex, a) => {
-    const m = /^#([0-9a-f]{6})$/i.exec(hex);
-    if (!m) return hex;
-    const n = parseInt(m[1], 16);
-    return 'rgba(' + (n >> 16) + ', ' + ((n >> 8) & 255) + ', ' + (n & 255) + ', ' + a + ')';
-  };
-  const COLOR_PAGO = { efectivo: '#4f9d69', nequi: '#8a6fbf', transferencia: '#2f6b8f', llave: '#f2a33a' };
 
-  // Estado que el usuario cambia con los botones
-  let range = 30;
-  let metric = 'unidades';
+  const isDark = () =>
+    document.documentElement.dataset.theme === 'dark' ||
+    document.body.classList.contains('dark') ||
+    window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-  const palette = () => ({
-    ink: css('--ink'), muted: css('--muted'), line: css('--line'), accent: css('--accent'), surface: css('--surface'),
-  });
-  const anim = (animate) => (animate && !reduced ? { duration: 700, easing: 'easeOutQuart' } : false);
-  const tooltip = (t, callbacks) => ({
-    backgroundColor: t.surface, titleColor: t.ink, bodyColor: t.ink, borderColor: t.line, borderWidth: 1,
-    padding: 10, boxPadding: 4, callbacks,
-  });
+  const gridColor = () => (isDark() ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)');
+  const textColor = () => (isDark() ? '#9ca3af' : '#4b5563');
 
-  const diasVisibles = () => data.dias.slice(-range);
-  const topOrdenado = () => [...data.top].sort((a, b) => b[metric] - a[metric]);
+  // 1. Gráfica: Ingresos por día
+  const ctxDias = document.getElementById('chDias');
+  let chartDias = null;
 
-  /* ---------- Ingresos por día (línea) ---------- */
-  function buildDias(t, animate) {
-    const canvas = $id('chDias');
-    if (!canvas) return null;
-    const dias = diasVisibles();
-    return new Chart(canvas, {
+  const renderDias = (rango) => {
+    if (!ctxDias) return;
+    const dias = (data.dias || []).slice(-rango);
+
+    const total = dias.reduce((acc, item) => acc + item.t, 0);
+    const prom = dias.length ? total / dias.length : 0;
+    const mejor = dias.reduce((max, item) => (item.t > max.t ? item : max), { d: '', t: 0 });
+
+    const elTotal = document.getElementById('sumTotal');
+    const elProm = document.getElementById('sumProm');
+    const elMejor = document.getElementById('sumMejor');
+
+    if (elTotal) elTotal.textContent = fmtCOP(total);
+    if (elProm) elProm.textContent = fmtCOP(prom);
+    if (elMejor) {
+      elMejor.textContent = mejor.t > 0 ? `${fmtCOP(mejor.t)} (${fmtFecha(mejor.d)})` : '—';
+    }
+
+    if (chartDias) chartDias.destroy();
+
+    chartDias = new Chart(ctxDias, {
       type: 'line',
       data: {
-        labels: dias.map((d) => d.d),
-        datasets: [{
-          label: 'Ingresos', data: dias.map((d) => d.t), borderColor: t.accent, backgroundColor: withAlpha(t.accent, 0.16),
-          fill: true, tension: 0.35, borderWidth: 2.5, pointRadius: dias.length > 31 ? 0 : 3, pointHoverRadius: 6,
-          pointBackgroundColor: t.accent,
-        }],
+        labels: dias.map((d) => fmtFecha(d.d)),
+        datasets: [
+          {
+            label: 'Ingresos',
+            data: dias.map((d) => d.t),
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.15)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.3,
+            pointRadius: dias.length <= 30 ? 3 : 1.5,
+            pointHoverRadius: 5,
+          },
+        ],
       },
       options: {
-        responsive: true, maintainAspectRatio: false, animation: anim(animate),
+        responsive: true,
+        maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
         plugins: {
           legend: { display: false },
-          tooltip: tooltip(t, {
-            title: (items) => fecha(diasVisibles()[items[0].dataIndex].d, { weekday: 'long', day: 'numeric', month: 'long' }),
-            label: (item) => ' ' + peso(item.parsed.y),
-            afterLabel: (item) => { const n = diasVisibles()[item.dataIndex].n; return ' ' + n + (n === 1 ? ' venta' : ' ventas'); },
-          }),
+          tooltip: {
+            callbacks: {
+              label: (ctx) => {
+                const item = dias[ctx.dataIndex];
+                const ventasTxt = item.n === 1 ? '1 venta' : `${item.n} ventas`;
+                return ` ${fmtCOP(ctx.parsed.y)} (${ventasTxt})`;
+              },
+            },
+          },
         },
         scales: {
           x: {
             grid: { display: false },
+            ticks: { color: textColor(), maxTicksLimit: 10 },
+          },
+          y: {
+            beginAtZero: true,
+            grid: { color: gridColor() },
             ticks: {
-              color: t.muted, maxRotation: 0, autoSkip: true, maxTicksLimit: 8,
-              callback(value) { return fecha(this.getLabelForValue(value), { day: 'numeric', month: 'short' }); },
+              color: textColor(),
+              callback: (v) => fmtCOP(v),
             },
           },
-          y: { beginAtZero: true, border: { display: false }, grid: { color: t.line }, ticks: { color: t.muted, callback: (v) => corto(v) } },
         },
       },
     });
-  }
+  };
 
-  function updateSummary() {
-    const dias = diasVisibles();
-    const total = dias.reduce((s, d) => s + d.t, 0);
-    const best = dias.reduce((b, d) => (d.t > b.t ? d : b), { t: 0, d: '' });
-    const set = (id, text) => { const el = $id(id); if (el) el.textContent = text; };
-    set('sumTotal', peso(total));
-    set('sumProm', peso(dias.length ? total / dias.length : 0));
-    set('sumMejor', best.t > 0 ? fecha(best.d, { weekday: 'short', day: 'numeric', month: 'short' }) + ' · ' + peso(best.t) : 'Sin ventas');
-  }
+  renderDias(30);
 
-  /* ---------- Métodos de pago del mes (dona) ---------- */
-  function buildMetodos(t, animate) {
-    const canvas = $id('chMetodos');
-    if (!canvas || !data.metodos.length) return null;
-    const total = data.metodos.reduce((s, m) => s + m.total, 0);
-    return new Chart(canvas, {
+  document.querySelectorAll('[data-range]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-range]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+      btn.setAttribute('aria-pressed', 'true');
+      renderDias(parseInt(btn.dataset.range, 10));
+    });
+  });
+
+  // 2. Gráfica: Métodos de pago del mes
+  const ctxMetodos = document.getElementById('chMetodos');
+  if (ctxMetodos && data.metodos && data.metodos.length) {
+    const colores = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'];
+    new Chart(ctxMetodos, {
       type: 'doughnut',
       data: {
         labels: data.metodos.map((m) => m.nombre),
-        datasets: [{
-          data: data.metodos.map((m) => m.total), backgroundColor: data.metodos.map((m) => COLOR_PAGO[m.k] || '#8899a6'),
-          borderColor: t.surface, borderWidth: 3, hoverOffset: 10,
-        }],
+        datasets: [
+          {
+            data: data.metodos.map((m) => m.total),
+            backgroundColor: data.metodos.map((_, i) => colores[i % colores.length]),
+            borderWidth: 0,
+          },
+        ],
       },
       options: {
-        responsive: true, maintainAspectRatio: false, cutout: '62%', animation: anim(animate),
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '62%',
         plugins: {
-          legend: { position: 'bottom', labels: { color: t.ink, usePointStyle: true, pointStyle: 'circle', padding: 16 } },
-          tooltip: tooltip(t, {
-            label: (item) => ' ' + item.label + ': ' + peso(item.parsed) + ' (' + Math.round((item.parsed / total) * 100) + '%)',
-          }),
+          legend: {
+            position: 'bottom',
+            labels: { color: textColor(), padding: 14, usePointStyle: true },
+          },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => ` ${ctx.label}: ${fmtCOP(ctx.parsed)}`,
+            },
+          },
         },
       },
     });
   }
 
-  /* ---------- Productos más vendidos del mes (barras horizontales) ---------- */
-  function buildTop(t, animate) {
-    const canvas = $id('chTop');
-    if (!canvas || !data.top.length) return null;
-    const rows = topOrdenado();
-    return new Chart(canvas, {
+  // 3. Gráfica: Más vendidos del mes
+  const ctxTop = document.getElementById('chTop');
+  let chartTop = null;
+
+  const renderTop = (metric) => {
+    if (!ctxTop || !data.top || !data.top.length) return;
+    if (chartTop) chartTop.destroy();
+
+    const esTotal = metric === 'total';
+    chartTop = new Chart(ctxTop, {
       type: 'bar',
       data: {
-        labels: rows.map((r) => r.nombre),
-        datasets: [{
-          data: rows.map((r) => r[metric]), backgroundColor: withAlpha(t.accent, 0.85), hoverBackgroundColor: t.accent,
-          borderRadius: 6, borderSkipped: false,
-        }],
+        labels: data.top.map((p) => p.nombre),
+        datasets: [
+          {
+            label: esTotal ? 'Ingresos' : 'Unidades',
+            data: data.top.map((p) => (esTotal ? p.total : p.unidades)),
+            backgroundColor: '#3b82f6',
+            borderRadius: 6,
+            maxBarThickness: 32,
+          },
+        ],
       },
       options: {
-        indexAxis: 'y', responsive: true, maintainAspectRatio: false, animation: anim(animate),
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
         plugins: {
           legend: { display: false },
-          tooltip: tooltip(t, {
-            label: (item) => (metric === 'total'
-              ? ' ' + peso(item.parsed.x)
-              : ' ' + item.parsed.x + (item.parsed.x === 1 ? ' unidad' : ' unidades')),
-          }),
+          tooltip: {
+            callbacks: {
+              label: (ctx) =>
+                esTotal
+                  ? ` ${fmtCOP(ctx.parsed.x)}`
+                  : ` ${ctx.parsed.x} ${ctx.parsed.x === 1 ? 'unidad' : 'unidades'}`,
+            },
+          },
         },
         scales: {
           x: {
-            beginAtZero: true, border: { display: false }, grid: { color: t.line },
-            ticks: { color: t.muted, callback: (v) => (metric === 'total' ? corto(v) : (Number.isInteger(v) ? v : '')) },
+            beginAtZero: true,
+            grid: { color: gridColor() },
+            ticks: {
+              color: textColor(),
+              callback: (v) => (esTotal ? fmtCOP(v) : v),
+            },
           },
-          y: { grid: { display: false }, ticks: { color: t.ink } },
+          y: {
+            grid: { display: false },
+            ticks: { color: textColor() },
+          },
         },
       },
     });
-  }
+  };
 
-  /* ---------- Armado, botones y cambio de tema ---------- */
-  let charts = {};
-  function buildAll(animate) {
-    Object.values(charts).forEach((c) => { if (c) c.destroy(); });
-    const t = palette();
-    charts = { dias: buildDias(t, animate), metodos: buildMetodos(t, animate), top: buildTop(t, animate) };
-    updateSummary();
-  }
+  renderTop('unidades');
 
-  const pressed = (buttons, attr, value) => buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset[attr] === String(value))));
-  const rangeBtns = [...document.querySelectorAll('[data-range]')];
-  const metricBtns = [...document.querySelectorAll('[data-metric]')];
-
-  rangeBtns.forEach((btn) => btn.addEventListener('click', () => {
-    range = parseInt(btn.dataset.range, 10);
-    pressed(rangeBtns, 'range', range);
-    if (charts.dias) {
-      const dias = diasVisibles();
-      charts.dias.data.labels = dias.map((d) => d.d);
-      charts.dias.data.datasets[0].data = dias.map((d) => d.t);
-      charts.dias.data.datasets[0].pointRadius = dias.length > 31 ? 0 : 3;
-      charts.dias.update();
-    }
-    updateSummary();
-  }));
-
-  metricBtns.forEach((btn) => btn.addEventListener('click', () => {
-    metric = btn.dataset.metric;
-    pressed(metricBtns, 'metric', metric);
-    if (charts.top) {
-      const rows = topOrdenado();
-      charts.top.data.labels = rows.map((r) => r.nombre);
-      charts.top.data.datasets[0].data = rows.map((r) => r[metric]);
-      charts.top.update();
-    }
-  }));
-
-  pressed(rangeBtns, 'range', range);
-  pressed(metricBtns, 'metric', metric);
-  buildAll(true);
-
-  // Al cambiar entre modo claro y oscuro se redibujan con los colores nuevos
-  new MutationObserver(() => buildAll(false)).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-})();
+  document.querySelectorAll('[data-metric]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-metric]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+      btn.setAttribute('aria-pressed', 'true');
+      renderTop(btn.dataset.metric);
+    });
+  });
+});
