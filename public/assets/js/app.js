@@ -268,4 +268,27 @@
     radios.forEach((r) => r.addEventListener('change', update));
     update();
   }
+
+  /* ---------- Inventario: eliminar un producto que ya tiene ventas (hay que escribir ELIMINAR) ---------- */
+  const delDialog = $('#deleteDialog');
+  if (delDialog) {
+    const confirmInput = $('#dConfirmar');
+    const confirmBtn = $('#dBtn');
+    const check = () => { confirmBtn.disabled = confirmInput.value.trim().toUpperCase() !== 'ELIMINAR'; };
+    $$('[data-delete]').forEach((btn) => btn.addEventListener('click', () => {
+      const info = JSON.parse(btn.dataset.delete);
+      $('#dId').value = info.id;
+      $('#dTexto').textContent = '«' + info.nombre + '» tiene ' + info.ventas
+        + (info.ventas === 1 ? ' venta registrada' : ' ventas registradas')
+        + '. Si lo eliminas, esas ventas también se borrarán para siempre y los reportes y totales cambiarán. '
+        + 'Si solo quieres ocultarlo, usa «Desactivar».';
+      confirmInput.value = '';
+      check();
+      delDialog.showModal();
+      confirmInput.focus();
+    }));
+    confirmInput.addEventListener('input', check);
+    $$('[data-close]', delDialog).forEach((btn) => btn.addEventListener('click', () => delDialog.close()));
+    delDialog.addEventListener('click', (e) => { if (e.target === delDialog) delDialog.close(); });
+  }
 })();

@@ -87,20 +87,32 @@ if (is_post()) {
             flash('ok', 'Estado del producto actualizado.');
         }
     } elseif ($accion === 'eliminar') {
-        // Solo se puede borrar de verdad un producto que NO tenga ventas registradas.
         $id = filter_var($_POST['id'] ?? '', FILTER_VALIDATE_INT);
         if ($id) {
             $ventas = (int) db_val(
                 'SELECT COUNT(*) FROM ventas WHERE id_producto = :id AND negocio_id = :n',
                 [':id' => $id, ':n' => $negocio]
             );
-            if ($ventas > 0) {
-                flash('error', "No se puede eliminar: el producto tiene $ventas venta(s) registradas y se perdería el historial. Desactívalo en su lugar.");
+            $confirmado = mb_strtoupper(post_string('confirmar')) === 'ELIMINAR';
+            if ($ventas > 0 && !$confirmado) {
+                // Con ventas registradas solo se borra si el administrador lo confirma escribiendo ELIMINAR.
+                flash('error', "Este producto tiene $ventas venta(s) registradas. Para eliminarlo junto con sus ventas, escribe ELIMINAR en la confirmación.");
             } else {
+                $pdo = db();
                 try {
+                    // Todo o nada: se borran las ventas del producto y luego el producto.
+                    $pdo->beginTransaction();
+                    db_exec('DELETE FROM ventas WHERE id_producto = :id AND negocio_id = :n', [':id' => $id, ':n' => $negocio]);
                     $filas = db_exec('DELETE FROM productos WHERE id = :id AND negocio_id = :n', [':id' => $id, ':n' => $negocio]);
-                    flash($filas ? 'ok' : 'error', $filas ? 'Producto eliminado definitivamente.' : 'No se encontró el producto.');
+                    $pdo->commit();
+                    flash(
+                        $filas ? 'ok' : 'error',
+                        $filas ? ($ventas > 0 ? "Producto eliminado junto con sus $ventas venta(s)." : 'Producto eliminado definitivamente.') : 'No se encontró el producto.'
+                    );
                 } catch (PDOException $ex) {
+                    if ($pdo->inTransaction()) {
+                        $pdo->rollBack();
+                    }
                     error_log('[controlshop] Error al eliminar producto: ' . $ex->getMessage());
                     flash('error', 'No se pudo eliminar el producto.');
                 }
@@ -195,6 +207,11 @@ page_start('Inventario', 'inventario.php', $user);
                       <?php if ($verInactivos): ?><input type="hidden" name="ver" value="1"><?php endif; ?>
                       <button class="btn btn-sm btn-danger" type="submit"><i class="fa-solid fa-trash"></i> Eliminar</button>
                     </form>
+                  <?php else: ?>
+                    <button class="btn btn-sm btn-danger" type="button"
+                            data-delete="<?= e(json_encode(['id' => (int) $p['id'], 'nombre' => $p['nombre'], 'ventas' => (int) $p['num_ventas']], JSON_UNESCAPED_UNICODE)) ?>">
+                      <i class="fa-solid fa-trash"></i> Eliminar
+                    </button>
                   <?php endif; ?>
                 </td>
               <?php endif; ?>
@@ -232,6 +249,24 @@ page_start('Inventario', 'inventario.php', $user);
           <div class="dialog-actions">
             <button class="btn" type="button" data-close>Cancelar</button>
             <button class="btn btn-primary" type="submit">Guardar</button>
+          </div>
+        </form>
+      </dialog>
+
+      <dialog id="deleteDialog">
+        <form method="post" class="form dialog-form">
+          <?= csrf_field() ?>
+          <input type="hidden" name="accion" value="eliminar">
+          <input type="hidden" name="id" id="dId" value="">
+          <?php if ($verInactivos): ?><input type="hidden" name="ver" value="1"><?php endif; ?>
+          <h2>Eliminar producto</h2>
+          <p class="warn-box" id="dTexto"></p>
+          <label>Para confirmar, escribe <strong>ELIMINAR</strong>
+            <input type="text" name="confirmar" id="dConfirmar" autocomplete="off" placeholder="ELIMINAR">
+          </label>
+          <div class="dialog-actions">
+            <button class="btn" type="button" data-close>Cancelar</button>
+            <button class="btn btn-danger-solid" type="submit" id="dBtn" disabled>Eliminar definitivamente</button>
           </div>
         </form>
       </dialog>
