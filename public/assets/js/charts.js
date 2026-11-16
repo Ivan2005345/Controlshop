@@ -202,6 +202,11 @@
   pressed(metricBtns, 'metric', metric);
   buildAll(true);
 
-  // Al cambiar entre modo claro y oscuro se redibujan con los colores nuevos
+  // Al cambiar entre modo claro y oscuro, o al elegir otro color, se redibujan con la paleta nueva
   new MutationObserver(() => buildAll(false)).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  let paletteTimer;
+  document.addEventListener('cs:palette', () => {
+    clearTimeout(paletteTimer); // mientras se arrastra el selector solo se redibuja al soltar
+    paletteTimer = setTimeout(() => buildAll(false), 120);
+  });
 })();

@@ -16,6 +16,8 @@
   --ok-soft: #e5f3ea;
   --accent: #2f6b8f;
   --accent-hover: #245673;
+  --on-steel: #ffffff;
+  --brand-ring: rgba(47, 107, 143, .28);
   --field-border: #b9c7d1;
   --hover: #f8fbfd;
   --ok-line: #b9dcc7;
@@ -58,8 +60,8 @@ small.block { display: block; }
   text-decoration: none; cursor: pointer; transition: border-color .15s, background-color .15s;
 }
 .btn:hover { border-color: var(--steel); color: var(--ink); }
-.btn-primary { background: var(--steel); border-color: var(--steel); color: #fff; }
-.btn-primary:hover { background: var(--steel-dark); border-color: var(--steel-dark); color: #fff; }
+.btn-primary { background: var(--steel); border-color: var(--steel); color: var(--on-steel); }
+.btn-primary:hover { background: var(--steel-dark); border-color: var(--steel-dark); color: var(--on-steel); }
 .btn-danger { color: var(--danger); border-color: var(--danger-line); }
 .btn-danger:hover { background: var(--danger-soft); border-color: var(--danger); color: var(--danger); }
 .btn-sm { padding: .3rem .7rem; font-size: .875rem; }
@@ -333,7 +335,7 @@ dialog::backdrop { background: rgba(20, 35, 45, .5); }
   transition: transform .45s cubic-bezier(.4, 0, .2, 1), background-color .45s ease;
 }
 .theme-switch .theme-knob svg { position: absolute; inset: 0; margin: auto; display: block; transition: transform .45s ease, opacity .3s ease; }
-.theme-switch .theme-sun { color: #fff; opacity: 1; transform: rotate(0) scale(1); }
+.theme-switch .theme-sun { color: var(--on-steel); opacity: 1; transform: rotate(0) scale(1); }
 .theme-switch .theme-moon { color: #1d3442; opacity: 0; transform: rotate(-120deg) scale(.3); }
 :root[data-theme="dark"] .theme-switch .theme-track { background: #1b2a38; }
 :root[data-theme="dark"] .theme-switch .theme-track::before { opacity: .85; }
@@ -345,6 +347,33 @@ dialog::backdrop { background: rgba(20, 35, 45, .5); }
 :root.theme-anim .theme-switch .theme-track { transition: background-color .4s ease, border-color .4s ease; }
 :root.theme-anim .theme-switch .theme-knob { transition: transform .45s cubic-bezier(.4, 0, .2, 1), background-color .45s ease; }
 :root.theme-anim .theme-switch .theme-knob svg { transition: transform .45s ease, opacity .3s ease; }
+
+/* ---------- Paleta de colores personalizada ---------- */
+.palette-dialog { width: min(440px, 92vw); max-height: 90vh; overflow-y: auto; }
+.palette-form { display: grid; gap: 1rem; padding: 1.5rem; }
+.palette-form h2 { margin: 0; }
+.palette-help { margin: 0; color: var(--muted); font-size: .9rem; }
+.palette-swatches { display: flex; flex-wrap: wrap; gap: .7rem; }
+.palette-swatch {
+  width: 2.5rem; height: 2.5rem; flex: 0 0 auto; padding: 0; cursor: pointer;
+  border: 2px solid var(--line); border-radius: 50%; background: var(--swatch);
+  transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.palette-swatch:hover { transform: translateY(-2px); }
+.palette-swatch[aria-pressed="true"] {
+  border-color: var(--surface); transform: scale(1.06);
+  box-shadow: 0 0 0 2px var(--steel), 0 0 0 4px var(--surface);
+}
+.palette-custom { display: grid; gap: .35rem; }
+.palette-custom-row { display: flex; align-items: center; gap: .75rem; }
+.palette-custom input[type="color"] {
+  flex: 1; min-width: 0; height: 44px; padding: .2rem; cursor: pointer;
+  border: 1px solid var(--field-border); border-radius: var(--radius); background: var(--surface);
+}
+.palette-custom output {
+  min-width: 5.5rem; text-align: right; color: var(--muted);
+  font-weight: 600; font-variant-numeric: tabular-nums;
+}
 
 /* ---------- Ojito de contraseña ---------- */
 .pw-field { position: relative; display: block; min-width: 0; }
@@ -383,7 +412,7 @@ dialog::backdrop { background: rgba(20, 35, 45, .5); }
 .pay-option:hover .pay-card { transform: translateY(-2px); border-color: var(--accent); }
 .pay-option input:active + .pay-card { transform: scale(.96); }
 .pay-option input:checked + .pay-card {
-  border-color: var(--steel); background: var(--mist); box-shadow: 0 0 0 3px rgba(47, 107, 143, .28);
+  border-color: var(--steel); background: var(--mist); box-shadow: 0 0 0 3px var(--brand-ring);
 }
 .pay-option input:checked + .pay-card .pay-icon { color: var(--accent); transform: scale(1.2) rotate(-8deg); }
 .pay-option input:checked + .pay-card .pay-check { opacity: 1; transform: scale(1) rotate(0); }
@@ -449,7 +478,7 @@ dialog::backdrop { background: rgba(20, 35, 45, .5); }
   font: inherit; font-size: .85rem; font-weight: 600; cursor: pointer; transition: background-color .25s ease, color .25s ease;
 }
 .seg-btn:hover { color: var(--ink); }
-.seg-btn[aria-pressed="true"] { background: var(--steel); color: #fff; }
+.seg-btn[aria-pressed="true"] { background: var(--steel); color: var(--on-steel); }
 .facts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .5rem 2rem; }
 .facts-grid > div { padding: .3rem 0; border-bottom: 0; }
 @media (min-width: 861px) { .split.split-half { grid-template-columns: 1fr 1fr; } }
@@ -491,10 +520,10 @@ dialog::backdrop { background: rgba(20, 35, 45, .5); }
 .stat-note { margin: .2rem 0 0; color: var(--muted); font-size: .78rem; }
 .stat-feature {
   background: linear-gradient(135deg, var(--steel), var(--steel-dark));
-  border-color: transparent; color: #fff;
+  border-color: transparent; color: var(--on-steel);
 }
-.stat-feature .stat-icon { background: rgba(255, 255, 255, .18); color: #fff; }
-.stat-feature .stat-label, .stat-feature .stat-note { color: rgba(255, 255, 255, .82); }
+.stat-feature .stat-icon { background: rgba(255, 255, 255, .18); color: var(--on-steel); }
+.stat-feature .stat-label, .stat-feature .stat-note { color: inherit; opacity: .82; }
 .stat-feature .stat-value { font-size: 2rem; }
 
 /* Franja compacta con las cifras secundarias */

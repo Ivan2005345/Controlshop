@@ -17,6 +17,7 @@ function html_head(string $title): void
       document.documentElement.dataset.theme = t;
     } catch (e) {}
   </script>
+  <script src="<?= e(asset('assets/js/palette.js')) ?>"></script>
   <title><?= e($title) ?> · ControlShop</title>
   <link rel="icon" href="assets/img/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -71,6 +72,9 @@ function page_start(string $title, string $active, array $user): void
       <?php endforeach; ?>
     </nav>
     <div class="sidebar-foot">
+      <button class="nav-link" type="button" data-palette-open aria-haspopup="dialog" aria-controls="paletteDialog">
+        <i class="fa-solid fa-palette"></i> Colores
+      </button>
       <?php theme_button(true); ?>
       <form method="post" action="logout.php">
         <?= csrf_field() ?>
@@ -79,6 +83,31 @@ function page_start(string $title, string $active, array $user): void
     </div>
   </aside>
   <div class="scrim" id="scrim"></div>
+
+  <dialog id="paletteDialog" class="palette-dialog" aria-labelledby="paletteTitle">
+    <form method="dialog" class="palette-form">
+      <h2 id="paletteTitle">Color de la aplicación</h2>
+      <p class="palette-help">Elige un color rápido o uno personalizado. Se guarda en este navegador.</p>
+      <div class="palette-swatches" role="group" aria-label="Colores rápidos">
+        <button class="palette-swatch" type="button" data-palette-color="#2f6b8f" style="--swatch: #2f6b8f" aria-label="Azul" aria-pressed="false"></button>
+        <button class="palette-swatch" type="button" data-palette-color="#c0392b" style="--swatch: #c0392b" aria-label="Rojo" aria-pressed="false"></button>
+        <button class="palette-swatch" type="button" data-palette-color="#d9a400" style="--swatch: #d9a400" aria-label="Amarillo" aria-pressed="false"></button>
+        <button class="palette-swatch" type="button" data-palette-color="#7a4bb5" style="--swatch: #7a4bb5" aria-label="Morado" aria-pressed="false"></button>
+        <button class="palette-swatch" type="button" data-palette-color="#2e7d5b" style="--swatch: #2e7d5b" aria-label="Verde" aria-pressed="false"></button>
+        <button class="palette-swatch" type="button" data-palette-color="#c2477f" style="--swatch: #c2477f" aria-label="Rosa" aria-pressed="false"></button>
+      </div>
+      <label class="palette-custom">Color personalizado
+        <span class="palette-custom-row">
+          <input type="color" id="paletteColor" value="#2f6b8f">
+          <output id="paletteValue" for="paletteColor">#2F6B8F</output>
+        </span>
+      </label>
+      <div class="dialog-actions">
+        <button class="btn" type="button" data-palette-reset>Restablecer</button>
+        <button class="btn btn-primary" type="submit">Listo</button>
+      </div>
+    </form>
+  </dialog>
 
   <main class="main">
     <?php foreach ($flashes as $f): ?>

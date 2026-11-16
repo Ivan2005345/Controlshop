@@ -41,12 +41,42 @@
       root.classList.add('theme-anim'); // activa la transición suave de colores
       root.dataset.theme = next;
       try { localStorage.setItem('cs_tema', next); } catch (err) { /* sin almacenamiento */ }
+      if (window.CS_Palette) window.CS_Palette.refresh(); // el color elegido se recalcula para el nuevo modo
       syncSwitches();
       clearTimeout(animTimer);
       animTimer = setTimeout(() => root.classList.remove('theme-anim'), 600);
     });
   });
   syncSwitches();
+
+  /* ---------- Paleta de colores personalizada ---------- */
+  const palette = window.CS_Palette;
+  const paletteDialog = $('#paletteDialog');
+  if (palette && paletteDialog) {
+    const colorInput = $('#paletteColor', paletteDialog);
+    const valueOut = $('#paletteValue', paletteDialog);
+    const swatches = $$('[data-palette-color]', paletteDialog);
+
+    const syncPalette = (color) => {
+      const value = palette.normalize(color) || palette.DEFAULT;
+      swatches.forEach((btn) => {
+        btn.setAttribute('aria-pressed', String(btn.dataset.paletteColor.toLowerCase() === value));
+      });
+      if (colorInput) colorInput.value = value;
+      if (valueOut) valueOut.textContent = value.toUpperCase();
+    };
+    const choose = (color) => syncPalette(palette.set(color));
+
+    $$('[data-palette-open]').forEach((btn) => btn.addEventListener('click', () => {
+      syncPalette(palette.get());
+      paletteDialog.showModal();
+    }));
+    swatches.forEach((btn) => btn.addEventListener('click', () => choose(btn.dataset.paletteColor)));
+    if (colorInput) colorInput.addEventListener('input', () => choose(colorInput.value));
+    $$('[data-palette-reset]', paletteDialog).forEach((btn) => btn.addEventListener('click', () => choose(palette.DEFAULT)));
+    paletteDialog.addEventListener('click', (e) => { if (e.target === paletteDialog) paletteDialog.close(); });
+    syncPalette(palette.get());
+  }
 
   /* ---------- Menú lateral en celular ---------- */
   const menuBtn = $('#menuBtn');
