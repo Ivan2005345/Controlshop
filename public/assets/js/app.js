@@ -29,7 +29,11 @@
   /* ---------- Modo claro / oscuro (la elección se recuerda en este navegador) ---------- */
   const root = document.documentElement;
   const switches = $$('[data-theme-toggle]');
-  const syncSwitches = () => switches.forEach((sw) => sw.setAttribute('aria-checked', String(root.dataset.theme === 'dark')));
+  const syncSwitches = () => switches.forEach((sw) => {
+    const dark = root.dataset.theme === 'dark';
+    sw.setAttribute('aria-checked', String(dark));
+    sw.setAttribute('aria-label', dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
+  });
   let animTimer;
   switches.forEach((sw) => {
     sw.addEventListener('click', () => {

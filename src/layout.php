@@ -111,7 +111,7 @@ function auth_start(string $title): void
     <p>Tu inventario, tus ventas y tu equipo, en un solo lugar.</p>
   </section>
   <main class="auth-panel">
-    <?php theme_button(); ?>
+    <?php theme_button(true); ?>
     <div class="auth-box">
       <a href="index.php"><img class="auth-logo" src="assets/img/logo.png" alt="ControlShop"></a>
 <?php
@@ -132,10 +132,13 @@ function auth_end(): void
 function theme_button(bool $label = false): void
 {
     ?>
-<button class="theme-switch<?= $label ? ' with-label' : '' ?>" type="button" role="switch" aria-checked="false" data-theme-toggle aria-label="Modo oscuro">
-  <?php if ($label): ?><span>Modo oscuro</span><?php endif; ?>
+<button class="theme-switch<?= $label ? ' with-label' : '' ?>" type="button" role="switch" aria-checked="false" data-theme-toggle aria-label="Cambiar entre modo claro y oscuro">
+  <?php if ($label): ?><span class="theme-switch-label"><span class="when-light">Modo oscuro</span><span class="when-dark">Modo claro</span></span><?php endif; ?>
   <span class="theme-track" aria-hidden="true">
-    <span class="theme-knob"><i class="fa-solid fa-sun theme-sun"></i><i class="fa-solid fa-moon theme-moon"></i></span>
+    <span class="theme-knob">
+      <svg class="theme-sun" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="theme-moon" viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+    </span>
   </span>
 </button>
 <?php

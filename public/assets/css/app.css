@@ -297,16 +297,31 @@ dialog::backdrop { background: rgba(20, 35, 45, .5); }
 .auth-panel { position: relative; }
 .site-nav { align-items: center; }
 .theme-switch {
-  display: flex; align-items: center; gap: .75rem; padding: .5rem .8rem; border: 0; border-radius: var(--radius);
+  display: flex; align-items: center; gap: .7rem; padding: .5rem .8rem; border: 0; border-radius: var(--radius);
   background: none; color: var(--ink); font: inherit; font-weight: 600; cursor: pointer;
+  transition: background-color .2s ease, border-color .2s ease;
 }
 .theme-switch:hover { background: var(--mist); }
 .theme-switch.with-label { width: 100%; justify-content: space-between; }
-.auth-panel .theme-switch { position: absolute; top: 1rem; right: 1rem; padding: .25rem; }
+.theme-switch-label { text-align: left; }
+.theme-switch .when-dark { display: none; }
+:root[data-theme="dark"] .theme-switch .when-light { display: none; }
+:root[data-theme="dark"] .theme-switch .when-dark { display: inline; }
+
+/* En el acceso el interruptor flota arriba a la derecha como una píldora clara */
+.auth-panel .theme-switch {
+  position: absolute; top: 1rem; right: 1rem; z-index: 2;
+  padding: .35rem .45rem .35rem .9rem; gap: .6rem;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+  font-size: .82rem; box-shadow: 0 1px 3px rgba(20, 35, 45, .1);
+}
+.auth-panel .theme-switch.with-label { width: auto; }
+.auth-panel .theme-switch:hover { background: var(--hover); border-color: var(--field-border); }
+
 .theme-switch .theme-track {
   position: relative; flex: none; width: 52px; height: 28px; overflow: hidden;
   border: 1px solid var(--line); border-radius: 999px; background: #bfe0f5;
-  transition: background-color .4s ease;
+  transition: background-color .4s ease, border-color .4s ease;
 }
 .theme-switch .theme-track::before { /* estrellitas que aparecen de noche */
   content: ""; position: absolute; left: 9px; top: 8px; width: 2px; height: 2px; border-radius: 50%; background: #fff;
@@ -314,10 +329,10 @@ dialog::backdrop { background: rgba(20, 35, 45, .5); }
 }
 .theme-switch .theme-knob {
   position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; display: grid; place-items: center;
-  border-radius: 50%; background: var(--tag); box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
+  border-radius: 50%; background: var(--steel); box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
   transition: transform .45s cubic-bezier(.4, 0, .2, 1), background-color .45s ease;
 }
-.theme-switch .theme-knob i { position: absolute; font-size: 12px; transition: transform .45s ease, opacity .3s ease; }
+.theme-switch .theme-knob svg { position: absolute; inset: 0; margin: auto; display: block; transition: transform .45s ease, opacity .3s ease; }
 .theme-switch .theme-sun { color: #fff; opacity: 1; transform: rotate(0) scale(1); }
 .theme-switch .theme-moon { color: #1d3442; opacity: 0; transform: rotate(-120deg) scale(.3); }
 :root[data-theme="dark"] .theme-switch .theme-track { background: #1b2a38; }
@@ -325,6 +340,11 @@ dialog::backdrop { background: rgba(20, 35, 45, .5); }
 :root[data-theme="dark"] .theme-switch .theme-knob { transform: translateX(24px); background: #e6eef3; }
 :root[data-theme="dark"] .theme-switch .theme-sun { opacity: 0; transform: rotate(120deg) scale(.3); }
 :root[data-theme="dark"] .theme-switch .theme-moon { opacity: 1; transform: rotate(0) scale(1); }
+
+/* La transición global de colores no debe cancelar el deslizamiento de la bolita */
+:root.theme-anim .theme-switch .theme-track { transition: background-color .4s ease, border-color .4s ease; }
+:root.theme-anim .theme-switch .theme-knob { transition: transform .45s cubic-bezier(.4, 0, .2, 1), background-color .45s ease; }
+:root.theme-anim .theme-switch .theme-knob svg { transition: transform .45s ease, opacity .3s ease; }
 
 /* ---------- Ojito de contraseña ---------- */
 .pw-field { position: relative; display: block; min-width: 0; }
