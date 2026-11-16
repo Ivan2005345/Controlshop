@@ -157,7 +157,7 @@ page_start('Inventario', 'inventario.php', $user);
       <?php endif; ?>
     </div>
 
-    <div class="table-wrap">
+    <div class="table-wrap table-cards">
       <table id="tablaProductos" data-filterable>
         <thead>
           <tr>
@@ -184,11 +184,11 @@ page_start('Inventario', 'inventario.php', $user);
               );
           ?>
             <tr data-search="<?= e(mb_strtolower($p['nombre'])) ?>" data-cat="<?= e(mb_strtolower($p['categoria'])) ?>"<?= $activo ? '' : ' class="row-off"' ?>>
-              <td><?= e($p['nombre']) ?></td>
-              <td><?= e($p['categoria']) ?></td>
-              <td class="num"><?= e(money($p['precio'])) ?></td>
-              <td class="num"><?= $stock ?></td>
-              <td><span class="chip <?= $chip ?>"><?= $texto ?></span></td>
+              <td data-label="Producto"><?= e($p['nombre']) ?></td>
+              <td data-label="Categoría"><?= e($p['categoria']) ?></td>
+              <td class="num" data-label="Precio"><?= e(money($p['precio'])) ?></td>
+              <td class="num" data-label="Stock"><?= $stock ?></td>
+              <td data-label="Estado"><span class="chip <?= $chip ?>"><?= $texto ?></span></td>
               <?php if ($esAdmin): ?>
                 <td class="actions">
                   <button class="btn btn-sm" type="button" data-edit="<?= e($json) ?>"><i class="fa-solid fa-pen"></i> Editar</button>

@@ -117,7 +117,7 @@ page_start('Equipo', 'usuarios.php', $user);
         <div class="toolbar">
           <input type="search" data-filter="text" data-filter-for="tablaEquipo" placeholder="Buscar persona" aria-label="Buscar persona">
         </div>
-        <div class="table-wrap">
+        <div class="table-wrap table-cards">
           <table id="tablaEquipo" data-filterable>
             <thead><tr><th>Usuario</th><th>Rol</th><th>Estado</th><th><span class="sr-only">Acciones</span></th></tr></thead>
             <tbody>
@@ -125,9 +125,9 @@ page_start('Equipo', 'usuarios.php', $user);
                   $activo = (int) $m['activo'] === 1;
                   $esYo = (int) $m['id'] === $user['id']; ?>
                 <tr data-search="<?= e(mb_strtolower($m['usuario'] . ' ' . $m['email'])) ?>"<?= $activo ? '' : ' class="row-off"' ?>>
-                  <td><?= e($m['usuario']) ?><?= $esYo ? ' <small>(tú)</small>' : '' ?><small class="block"><?= e($m['email']) ?></small></td>
-                  <td><?= $m['rol'] === 'admin' ? 'Administrador' : 'Empleado' ?></td>
-                  <td><span class="chip <?= $activo ? 'chip-ok' : 'chip-off' ?>"><?= $activo ? 'Activo' : 'Inactivo' ?></span></td>
+                  <td data-label="Usuario"><?= e($m['usuario']) ?><?= $esYo ? ' <small>(tú)</small>' : '' ?><small class="block"><?= e($m['email']) ?></small></td>
+                  <td data-label="Rol"><?= $m['rol'] === 'admin' ? 'Administrador' : 'Empleado' ?></td>
+                  <td data-label="Estado"><span class="chip <?= $activo ? 'chip-ok' : 'chip-off' ?>"><?= $activo ? 'Activo' : 'Inactivo' ?></span></td>
                   <td class="actions">
                     <?php if (!$esYo): ?>
                       <form method="post" class="inline">

@@ -106,7 +106,7 @@ page_start('Reportes', 'reportes.php', $user);
         <?php if (!$porMetodo): ?>
           <p class="empty">Todavía no hay ventas este mes.</p>
         <?php else: ?>
-          <div class="chart-box"><canvas id="chMetodos" role="img" aria-label="Ingresos del mes por método de pago"></canvas></div>
+          <div class="chart-box chart-box-tall"><canvas id="chMetodos" role="img" aria-label="Ingresos del mes por método de pago"></canvas></div>
         <?php endif; ?>
       </section>
 

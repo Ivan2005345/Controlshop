@@ -590,16 +590,140 @@ dialog::backdrop { background: rgba(20, 35, 45, .5); }
 @media (max-width: 640px) {
   .dash-actions { width: 100%; }
   .dash-actions .btn { flex: 1 1 auto; }
-  .stat-feature .stat-value { font-size: 1.8rem; }
+  .dash-date { font-size: .85rem; }
+  .dash-hero .lead { font-size: 1rem; }
+  .stat-label { font-size: .9rem; }
+  .stat-note { font-size: .84rem; }
+  .stat-feature .stat-value { font-size: 1.9rem; }
+  .mini-stat { font-size: .92rem; }
+  .mini-stat strong { font-size: 1.05rem; }
+  .stock-name, .agenda-list li > span, .pay-summary-name { font-size: .98rem; }
+  .pay-summary li > strong { font-size: 1.1rem; }
 }
 @media (max-width: 460px) {
-  .stat-grid { grid-template-columns: 1fr; }
-  .stat-value { font-size: 1.45rem; }
-  .stat-feature .stat-value { font-size: 1.8rem; }
+  .stat-grid { grid-template-columns: 1fr; gap: .75rem; }
+  .stat {
+    display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto auto;
+    column-gap: .9rem; row-gap: .1rem; align-items: center; padding: .9rem 1rem;
+  }
+  .stat-icon { grid-row: 1 / 4; width: 2.7rem; height: 2.7rem; margin: 0; font-size: 1.1rem; }
+  .stat-label { grid-column: 2; font-size: .95rem; }
+  .stat-value { grid-column: 2; font-size: 1.7rem; }
+  .stat-feature .stat-value { font-size: 2rem; }
+  .stat-note { grid-column: 2; font-size: .88rem; }
+  .mini-stat { font-size: .9rem; }
+  .dash-actions .btn-primary { flex: 1 1 100%; }
+  .dash-actions .btn:not(.btn-primary) { flex: 1 1 calc(50% - .25rem); }
   .agenda-form { flex-wrap: wrap; }
   .agenda-form input { flex: 1 1 100%; }
   .agenda-form .btn { width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {
   .pay-summary-bar > span { animation: none; }
+}
+
+/* ---------- Móvil: contenido de Ventas, Inventario, Reportes, Equipo y Nueva venta ---------- */
+/* Las tablas se convierten en tarjetas: cada fila muestra sus datos con su etiqueta. */
+@media (max-width: 700px) {
+  .table-wrap.table-cards { overflow: visible; background: none; border: 0; border-radius: 0; }
+  .table-cards table, .table-cards thead, .table-cards tbody, .table-cards tfoot,
+  .table-cards tr, .table-cards th, .table-cards td { display: block; width: 100%; }
+  .table-cards thead { display: none; }
+  .table-cards tbody tr {
+    margin: 0 0 .75rem; padding: .15rem .95rem;
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  }
+  .table-cards tbody tr:hover { background: var(--surface); }
+  .table-cards tbody td {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+    padding: .55rem 0; border-bottom: 1px dashed var(--line); text-align: right;
+    font-size: .95rem; overflow-wrap: anywhere;
+  }
+  .table-cards tbody td:last-child { border-bottom: 0; }
+  .table-cards tbody td::before {
+    content: attr(data-label); flex: 0 0 auto; text-align: left;
+    color: var(--muted); font-size: .8rem; font-weight: 600;
+  }
+  .table-cards tbody td.num { white-space: normal; }
+  .table-cards tbody td[data-label="Producto"],
+  .table-cards tbody td[data-label="Usuario"] { font-weight: 600; }
+  .table-cards tbody td[data-label="Usuario"] small.block { font-weight: 400; }
+  .table-cards tbody td.actions {
+    flex-wrap: wrap; justify-content: flex-start; gap: .45rem;
+    padding: .7rem 0 .6rem; white-space: normal;
+  }
+  .table-cards tbody td.actions::before { display: none; }
+  .table-cards tbody td.actions .btn { padding: .45rem .8rem; font-size: .9rem; }
+  .table-cards tbody td.actions .pass-box[open] { flex: 1 1 100%; margin: .2rem 0 0; }
+  .table-cards tbody td.actions .pass-box .inline-form { width: 100%; }
+  .table-cards tbody td.actions .pass-box .inline-form input { min-width: 0; }
+  .table-cards tbody td.empty-cell { display: block; padding: 1.5rem 0 !important; text-align: center; }
+  .table-cards tbody td.empty-cell::before { display: none; }
+  .table-cards tfoot tr {
+    display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+    padding: .7rem .95rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  }
+  .table-cards tfoot th, .table-cards tfoot td { width: auto; padding: 0; border: 0; background: none; text-align: right; }
+  .table-cards tfoot th { color: var(--muted); font-size: .85rem; text-align: left; }
+  .table-cards tfoot td:empty { display: none; }
+}
+
+@media (max-width: 640px) {
+  .main { padding-left: 1rem; padding-right: 1rem; padding-bottom: 3rem; }
+  .main > h1 { font-size: 1.65rem; }
+  .lead { font-size: .98rem; margin-bottom: 1.15rem; }
+  .panel { padding: 1rem; }
+  .flash { font-size: .9rem; }
+
+  /* Filtros y botones: campos a todo el ancho y botones fáciles de tocar */
+  .toolbar { gap: .6rem; margin-bottom: 1rem; }
+  .toolbar input[type="search"], .toolbar > select { flex: 1 1 100%; max-width: none; }
+  .toolbar .inline-label { flex: 1 1 calc(50% - .3rem); display: grid; gap: .3rem; font-size: .85rem; }
+  .toolbar .inline-label input, .toolbar .inline-label select { width: 100%; }
+  .toolbar > .btn { flex: 1 1 calc(50% - .3rem); }
+  .toolbar > .btn-primary { flex: 1 1 100%; }
+
+  /* Cifras de Reportes: una fila por dato, etiqueta a la izquierda y valor a la derecha */
+  .figures { display: grid; grid-template-columns: 1fr; margin-bottom: 1.25rem; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .figures > div, .figures .figure-main {
+    flex-basis: auto; display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;
+    padding: .8rem 1rem; border-left: 0; border-top: 1px solid var(--line);
+  }
+  .figures > div:first-child { border-top: 0; }
+  .figures dt { font-size: .9rem; }
+  .figures dd, .figures .figure-main dd { margin: 0; font-size: 1.45rem; text-align: right; }
+  .figures .figure-main dd { font-size: 1.8rem; }
+
+  .mini-stats { display: grid; grid-template-columns: 1fr; gap: .4rem; margin-bottom: .9rem; }
+  .mini-stats > div { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: .45rem .7rem; background: var(--mist); border-radius: 8px; }
+  .mini-stats dd { font-size: 1rem; }
+
+  .panel-head { gap: .6rem; }
+  .panel-head .seg { width: 100%; }
+  .panel-head .seg-btn { flex: 1; padding: .4rem .5rem; }
+  .chart-box { height: 240px; }
+  .chart-box.chart-box-tall { height: 280px; }
+  .chart-box.chart-fail { height: auto; }
+  .facts-grid { grid-template-columns: 1fr; gap: 0; }
+  .facts-grid > div { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: .6rem 0; border-bottom: 1px solid var(--line); }
+  .facts-grid > div:last-child { border-bottom: 0; }
+  .facts-grid dd { text-align: right; }
+
+  /* Nueva venta: ticket y medios de pago más cómodos */
+  .sale-layout { gap: 1.25rem; }
+  .ticket { padding: 1rem 1rem 1.25rem; }
+  .ticket-lines li { grid-template-columns: minmax(0, 1fr) auto auto; gap: .4rem; }
+  .ticket-name { overflow-wrap: anywhere; }
+  .ticket-total strong { font-size: 1.55rem; }
+  .cash-amount { font-size: 1.8rem; }
+  .pay-card { padding: .75rem .4rem .65rem; }
+  .pay-name { font-size: .8rem; }
+}
+
+@media (max-width: 460px) {
+  .toolbar .inline-label { flex-basis: 100%; }
+  .chart-box { height: 220px; }
+  .chart-box.chart-box-tall { height: 270px; }
+  .seg-btn { font-size: .8rem; padding: .35rem .4rem; }
+  .ticket-total strong { font-size: 1.45rem; }
 }

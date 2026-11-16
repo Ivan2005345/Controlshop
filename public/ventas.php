@@ -67,7 +67,7 @@ page_start('Ventas', 'ventas.php', $user);
       <a class="btn btn-primary push-right" href="vender.php"><i class="fa-solid fa-plus"></i> Nueva venta</a>
     </form>
 
-    <div class="table-wrap">
+    <div class="table-wrap table-cards">
       <table>
         <thead>
           <tr>
@@ -81,13 +81,13 @@ page_start('Ventas', 'ventas.php', $user);
           <?php endif; ?>
           <?php foreach ($ventas as $v): ?>
             <tr>
-              <td><?= e($v['fecha']) ?></td>
-              <td><?= e($v['producto']) ?></td>
-              <td class="num"><?= (int) $v['cantidad'] ?></td>
-              <td class="num"><?= e(money($v['precio_unitario'])) ?></td>
-              <td class="num"><?= e(money($v['total'])) ?></td>
-              <td><?= e(METODOS_PAGO[$v['metodo_pago']] ?? $v['metodo_pago']) ?></td>
-              <?php if ($esAdmin): ?><td><?= e($v['vendedor']) ?></td><?php endif; ?>
+              <td data-label="Fecha"><?= e($v['fecha']) ?></td>
+              <td data-label="Producto"><?= e($v['producto']) ?></td>
+              <td class="num" data-label="Cantidad"><?= (int) $v['cantidad'] ?></td>
+              <td class="num" data-label="Precio"><?= e(money($v['precio_unitario'])) ?></td>
+              <td class="num" data-label="Total"><?= e(money($v['total'])) ?></td>
+              <td data-label="Pago"><?= e(METODOS_PAGO[$v['metodo_pago']] ?? $v['metodo_pago']) ?></td>
+              <?php if ($esAdmin): ?><td data-label="Vendedor"><?= e($v['vendedor']) ?></td><?php endif; ?>
             </tr>
           <?php endforeach; ?>
         </tbody>
