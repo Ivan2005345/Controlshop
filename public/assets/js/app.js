@@ -106,6 +106,7 @@
     const key = agenda.dataset.key;
     const list = $('#agendaList');
     const empty = $('#agendaEmpty');
+    const count = $('#agendaCount');
     const form = $('#agendaForm');
     const input = $('#agendaInput');
     let items = [];
@@ -121,14 +122,19 @@
         span.textContent = text; // textContent: el texto nunca se interpreta como HTML
         const done = document.createElement('button');
         done.type = 'button';
-        done.className = 'btn btn-sm';
-        done.textContent = 'Listo';
+        done.className = 'agenda-check';
+        done.title = 'Marcar como hecho';
         done.setAttribute('aria-label', 'Marcar como hecho: ' + text);
+        done.innerHTML = '<i class="fa-solid fa-check" aria-hidden="true"></i>';
         done.addEventListener('click', () => { items.splice(index, 1); save(); render(); });
-        li.append(span, done);
+        li.append(done, span);
         list.append(li);
       });
       empty.hidden = items.length > 0;
+      if (count) {
+        count.textContent = items.length + (items.length === 1 ? ' pendiente' : ' pendientes');
+        count.hidden = items.length === 0;
+      }
     };
 
     form.addEventListener('submit', (e) => {
