@@ -52,10 +52,20 @@ page_start('Ventas', 'ventas.php', $user);
     <p class="lead"><?= $esAdmin ? 'Todas las ventas del negocio, de la más reciente a la más antigua.' : 'Las ventas que has registrado, de la más reciente a la más antigua.' ?></p>
 
     <form method="get" class="toolbar">
-      <label class="inline-label">Desde <input type="date" name="desde" value="<?= e($desde) ?>"></label>
-      <label class="inline-label">Hasta <input type="date" name="hasta" value="<?= e($hasta) ?>"></label>
+      <label class="inline-label">Desde
+        <span class="date-control">
+          <input type="date" id="fDesde" name="desde" value="<?= e($desde) ?>" data-date-field>
+          <button class="date-open" type="button" data-date-open="fDesde" aria-label="Abrir calendario para la fecha Desde"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i></button>
+        </span>
+      </label>
+      <label class="inline-label">Hasta
+        <span class="date-control">
+          <input type="date" id="fHasta" name="hasta" value="<?= e($hasta) ?>" data-date-field>
+          <button class="date-open" type="button" data-date-open="fHasta" aria-label="Abrir calendario para la fecha Hasta"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i></button>
+        </span>
+      </label>
       <label class="inline-label">Pago
-        <select name="metodo">
+        <select name="metodo" class="filter-select">
           <option value="">Todos</option>
           <?php foreach (METODOS_PAGO as $clave => $nombre): ?>
             <option value="<?= e($clave) ?>"<?= $metodo === $clave ? ' selected' : '' ?>><?= e($nombre) ?></option>
@@ -66,6 +76,25 @@ page_start('Ventas', 'ventas.php', $user);
       <?php if ($desde !== '' || $hasta !== '' || $metodo !== ''): ?><a class="btn" href="ventas.php">Quitar filtro</a><?php endif; ?>
       <a class="btn btn-primary push-right" href="vender.php"><i class="fa-solid fa-plus"></i> Nueva venta</a>
     </form>
+
+    <dialog id="dateDialog" class="date-dialog" aria-labelledby="dateTitle">
+      <div class="date-dialog-inner">
+        <div class="date-head">
+          <button class="date-nav" type="button" data-date-prev aria-label="Mes anterior"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+          <h2 id="dateTitle"></h2>
+          <button class="date-nav" type="button" data-date-next aria-label="Mes siguiente"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+        </div>
+        <div class="date-weekdays" aria-hidden="true">
+          <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+        </div>
+        <div class="date-grid" data-date-grid></div>
+        <div class="dialog-actions date-actions">
+          <button class="btn btn-sm" type="button" data-date-clear>Borrar</button>
+          <button class="btn btn-sm" type="button" data-date-today>Hoy</button>
+          <button class="btn btn-sm btn-primary" type="button" data-date-close>Listo</button>
+        </div>
+      </div>
+    </dialog>
 
     <div class="table-wrap table-cards">
       <table>
@@ -101,4 +130,4 @@ page_start('Ventas', 'ventas.php', $user);
     <?php if (count($ventas) === $limite): ?>
       <p class="hint">Se muestran las últimas <?= $limite ?> líneas de venta. Usa el filtro de fechas para ver otras.</p>
     <?php endif; ?>
-<?php page_end(); ?>
+<?php page_end([asset('assets/js/datepicker.js')]); ?>

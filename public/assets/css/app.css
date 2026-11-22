@@ -2,6 +2,7 @@
 :root {
   --ink: #1d3442;
   --steel: #2f6b8f;
+  accent-color: var(--steel);
   --steel-dark: #245673;
   --mist: #eaf2f7;
   --tag: #f2a33a;
@@ -79,6 +80,27 @@ input, select {
   padding: .6rem .75rem; border: 1px solid var(--field-border); border-radius: var(--radius); min-width: 0;
 }
 input:focus, select:focus { border-color: var(--accent); }
+
+/* Filtro de Pago: la opción resaltada/seleccionada usa el color de la paleta.
+   En navegadores sin selector personalizable se conserva el comportamiento nativo. */
+.filter-select option { background: var(--surface); color: var(--ink); }
+.filter-select option:checked { background: var(--steel); color: var(--on-steel); }
+@supports (appearance: base-select) {
+  .filter-select, .filter-select::picker(select) { appearance: base-select; }
+  .filter-select::picker(select) {
+    border: 1px solid var(--line); border-radius: var(--radius); padding: .3rem;
+    background: var(--surface); color: var(--ink);
+    box-shadow: 0 12px 28px rgba(18, 36, 48, .2);
+  }
+  .filter-select::picker-icon { color: var(--accent); }
+  .filter-select option {
+    padding: .45rem .6rem; border-radius: 6px; background: transparent; color: var(--ink);
+  }
+  .filter-select option:hover,
+  .filter-select option:focus { background: var(--mist); color: var(--ink); outline: none; }
+  .filter-select option:checked,
+  .filter-select option:checked:hover { background: var(--steel); color: var(--on-steel); }
+}
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 form.inline { display: inline; }
 .inline-form { display: flex; gap: .5rem; align-items: center; }
@@ -173,6 +195,43 @@ dialog { border: 0; border-radius: 12px; padding: 0; width: min(480px, 92vw); co
 dialog::backdrop { background: rgba(20, 35, 45, .5); }
 .dialog-form { padding: 1.5rem; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: .75rem; margin-top: .5rem; }
+
+/* ---------- Calendario de los filtros de fecha ---------- */
+.date-control { position: relative; display: inline-flex; align-items: center; }
+.date-open { display: none; }
+.has-datepicker .date-control input[type="date"] { padding-right: 2.6rem; }
+.has-datepicker .date-control input[type="date"]::-webkit-calendar-picker-indicator { display: none; }
+.has-datepicker .date-open {
+  display: inline-flex; align-items: center; justify-content: center;
+  position: absolute; top: 2px; right: 2px; bottom: 2px; width: 2.1rem;
+  border: 0; border-radius: 6px; background: transparent; color: var(--accent); cursor: pointer;
+}
+.has-datepicker .date-open:hover { background: var(--mist); color: var(--steel); }
+.date-dialog { width: min(340px, calc(100vw - 2rem)); }
+.date-dialog-inner { padding: 1rem; }
+.date-head { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .75rem; }
+.date-head h2 { margin: 0; font-size: 1.05rem; text-transform: capitalize; }
+.date-nav {
+  width: 2rem; height: 2rem; display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink); cursor: pointer;
+}
+.date-nav:hover { background: var(--mist); border-color: var(--steel); color: var(--steel); }
+.date-weekdays, .date-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .2rem; }
+.date-weekdays span { text-align: center; font-size: .72rem; font-weight: 700; color: var(--muted); padding: .25rem 0; }
+.date-blank { display: block; aspect-ratio: 1; }
+.date-day {
+  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+  border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--ink);
+  font: inherit; font-size: .9rem; cursor: pointer;
+}
+.date-day:hover { background: var(--mist); color: var(--steel); }
+.date-day[aria-current="date"] { border-color: var(--steel); }
+.date-day[aria-pressed="true"] { background: var(--steel); border-color: var(--steel); color: var(--on-steel); font-weight: 700; }
+.date-day[aria-pressed="true"]:hover { background: var(--steel-dark); color: var(--on-steel); }
+.date-actions { flex-wrap: wrap; }
+.date-actions .btn:not(.btn-primary),
+.date-actions .btn:not(.btn-primary):hover { border-color: var(--steel); color: var(--accent); }
+.date-actions .btn:not(.btn-primary):hover { background: var(--mist); }
 
 /* ---------- Venta: el carrito es un ticket ---------- */
 .sale-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 380px); gap: 2rem; align-items: start; }
