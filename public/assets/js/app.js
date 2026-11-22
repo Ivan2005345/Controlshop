@@ -51,11 +51,10 @@
 
   /* ---------- Paleta de colores personalizada ---------- */
   const palette = window.CS_Palette;
-  const paletteDialog = $('#paletteDialog');
-  if (palette && paletteDialog) {
-    const colorInput = $('#paletteColor', paletteDialog);
-    const valueOut = $('#paletteValue', paletteDialog);
-    const swatches = $$('[data-palette-color]', paletteDialog);
+  if (palette) {
+    const colorInput = $('#paletteColor');
+    const valueOut = $('#paletteValue');
+    const swatches = $$('[data-palette-color]');
 
     const syncPalette = (color) => {
       const value = palette.normalize(color) || palette.DEFAULT;
@@ -67,14 +66,26 @@
     };
     const choose = (color) => syncPalette(palette.set(color));
 
-    $$('[data-palette-open]').forEach((btn) => btn.addEventListener('click', () => {
-      syncPalette(palette.get());
-      paletteDialog.showModal();
-    }));
     swatches.forEach((btn) => btn.addEventListener('click', () => choose(btn.dataset.paletteColor)));
     if (colorInput) colorInput.addEventListener('input', () => choose(colorInput.value));
-    $$('[data-palette-reset]', paletteDialog).forEach((btn) => btn.addEventListener('click', () => choose(palette.DEFAULT)));
-    paletteDialog.addEventListener('click', (e) => { if (e.target === paletteDialog) paletteDialog.close(); });
+    $$('[data-palette-reset]').forEach((btn) => btn.addEventListener('click', () => choose(palette.DEFAULT)));
+    document.addEventListener('cs:palette', (e) => syncPalette(e.detail.color)); // también si cambia en otra pestaña
+
+    $$('[data-appearance-reset]').forEach((btn) => btn.addEventListener('click', () => {
+      choose(palette.DEFAULT);
+      let theme = 'light';
+      try {
+        localStorage.removeItem('cs_tema');
+        theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      } catch (err) { /* sin almacenamiento */ }
+      root.classList.add('theme-anim');
+      root.dataset.theme = theme;
+      palette.refresh();
+      syncSwitches();
+      clearTimeout(animTimer);
+      animTimer = setTimeout(() => root.classList.remove('theme-anim'), 600);
+    }));
+
     syncPalette(palette.get());
   }
 
