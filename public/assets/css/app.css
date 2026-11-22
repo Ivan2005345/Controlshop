@@ -81,25 +81,25 @@ input, select {
 }
 input:focus, select:focus { border-color: var(--accent); }
 
-/* Filtro de Pago: la opción resaltada/seleccionada usa el color de la paleta.
+/* Selects: la opción resaltada/seleccionada usa el color de la paleta en todas las vistas.
    En navegadores sin selector personalizable se conserva el comportamiento nativo. */
-.filter-select option { background: var(--surface); color: var(--ink); }
-.filter-select option:checked { background: var(--steel); color: var(--on-steel); }
+select option { background: var(--surface); color: var(--ink); }
+select option:checked { background: var(--steel); color: var(--on-steel); }
 @supports (appearance: base-select) {
-  .filter-select, .filter-select::picker(select) { appearance: base-select; }
-  .filter-select::picker(select) {
+  select, select::picker(select) { appearance: base-select; }
+  select::picker(select) {
     border: 1px solid var(--line); border-radius: var(--radius); padding: .3rem;
     background: var(--surface); color: var(--ink);
     box-shadow: 0 12px 28px rgba(18, 36, 48, .2);
   }
-  .filter-select::picker-icon { color: var(--accent); }
-  .filter-select option {
+  select::picker-icon { color: var(--accent); }
+  select option {
     padding: .45rem .6rem; border-radius: 6px; background: transparent; color: var(--ink);
   }
-  .filter-select option:hover,
-  .filter-select option:focus { background: var(--mist); color: var(--ink); outline: none; }
-  .filter-select option:checked,
-  .filter-select option:checked:hover { background: var(--steel); color: var(--on-steel); }
+  select option:hover,
+  select option:focus { background: var(--mist); color: var(--ink); outline: none; }
+  select option:checked,
+  select option:checked:hover { background: var(--steel); color: var(--on-steel); }
 }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 form.inline { display: inline; }
@@ -199,7 +199,7 @@ dialog::backdrop { background: rgba(20, 35, 45, .5); }
 /* ---------- Calendario de los filtros de fecha ---------- */
 .date-control { position: relative; display: inline-flex; align-items: center; }
 .date-open { display: none; }
-.has-datepicker .date-control input[type="date"] { padding-right: 2.6rem; }
+.has-datepicker .date-control input[type="date"] { padding-right: 2.6rem; cursor: pointer; }
 .has-datepicker .date-control input[type="date"]::-webkit-calendar-picker-indicator { display: none; }
 .has-datepicker .date-open {
   display: inline-flex; align-items: center; justify-content: center;

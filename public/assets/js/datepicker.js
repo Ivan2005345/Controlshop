@@ -65,7 +65,7 @@
   };
 
   const open = (input) => {
-    if (!input) return;
+    if (!input || dialog.open) return;
     field = input;
     const start = parse(input.value) || new Date();
     year = start.getFullYear();
@@ -85,6 +85,13 @@
 
   document.querySelectorAll('[data-date-open]').forEach((btn) => {
     btn.addEventListener('click', () => open(document.getElementById(btn.dataset.dateOpen)));
+  });
+  // Chrome pinta el segmento enfocado de azul y no lo deja teñir con CSS. Abrimos el
+  // calendario antes de que el input reciba el foco y nunca lo dejamos enfocado.
+  fields.forEach((input) => {
+    input.addEventListener('pointerdown', (e) => { e.preventDefault(); open(input); });
+    input.addEventListener('click', () => open(input));
+    input.addEventListener('focus', () => input.blur());
   });
   dialog.querySelector('[data-date-prev]').addEventListener('click', () => {
     const d = new Date(year, month - 1, 1);

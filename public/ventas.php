@@ -54,13 +54,13 @@ page_start('Ventas', 'ventas.php', $user);
     <form method="get" class="toolbar">
       <label class="inline-label">Desde
         <span class="date-control">
-          <input type="date" id="fDesde" name="desde" value="<?= e($desde) ?>" data-date-field>
+          <input type="date" id="fDesde" name="desde" value="<?= e($desde) ?>" data-date-field tabindex="-1">
           <button class="date-open" type="button" data-date-open="fDesde" aria-label="Abrir calendario para la fecha Desde"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i></button>
         </span>
       </label>
       <label class="inline-label">Hasta
         <span class="date-control">
-          <input type="date" id="fHasta" name="hasta" value="<?= e($hasta) ?>" data-date-field>
+          <input type="date" id="fHasta" name="hasta" value="<?= e($hasta) ?>" data-date-field tabindex="-1">
           <button class="date-open" type="button" data-date-open="fHasta" aria-label="Abrir calendario para la fecha Hasta"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i></button>
         </span>
       </label>
