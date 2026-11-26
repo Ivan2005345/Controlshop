@@ -281,7 +281,11 @@
       const blocked = cashMode && paid !== null && paid < total;
       if (payBtn) {
         payBtn.disabled = blocked; // no deja cobrar si el dinero recibido no alcanza
-        payBtn.title = blocked ? 'El dinero recibido no cubre el total' : '';
+        // El tooltip nativo de title dibuja un segundo cursor al aparecer. El motivo
+        // ya se muestra en .cash-result; solo lo enlazamos como descripción.
+        payBtn.removeAttribute('title');
+        if (blocked) payBtn.setAttribute('aria-describedby', 'cashResult');
+        else payBtn.removeAttribute('aria-describedby');
       }
       if (!cashMode) return;
 

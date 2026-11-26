@@ -481,7 +481,14 @@ dialog::backdrop { background: rgba(20, 35, 45, .5); }
 .pay-option input:focus-visible + .pay-card { outline: 3px solid var(--tag); outline-offset: 2px; }
 
 /* ---------- Calculadora de vueltos ---------- */
-.btn:disabled { opacity: .5; cursor: not-allowed; }
+/* Un único cursor en el estado deshabilitado: se aplica al botón, a sus hijos y
+   a sus pseudo-elementos, sin pointer-events: none (así el hover sigue llegando
+   al botón y no aparece el cursor del elemento de debajo). */
+.btn:disabled { opacity: .5; }
+.btn:disabled,
+.btn:disabled *,
+.btn:disabled::before,
+.btn:disabled::after { cursor: not-allowed; }
 .btn:disabled:hover { border-color: var(--line); }
 .btn-primary:disabled:hover { background: var(--steel); border-color: var(--steel); }
 
