@@ -230,12 +230,23 @@
     // El número "cuenta" desde el valor anterior hasta el nuevo
     let shown = 0;
     let rafId = 0;
+    let amountToken = 0;
+    // Cancela cualquier cuenta en curso y deja el importe vacío, como al abrir la venta.
+    const clearAmount = () => {
+      cancelAnimationFrame(rafId);
+      rafId = 0;
+      amountToken++;
+      shown = 0;
+      amount.textContent = '';
+    };
     const animateNumber = (to) => {
       cancelAnimationFrame(rafId);
+      const token = ++amountToken;
       const from = shown;
       if (reduced || from === to) { shown = to; amount.textContent = money(to); return; }
       const start = performance.now();
       const step = (now) => {
+        if (token !== amountToken) return; // ya se vació o cambió el importe
         const p = Math.min((now - start) / 450, 1);
         shown = from + (to - from) * (1 - Math.pow(1 - p, 3));
         amount.textContent = money(shown);
@@ -287,13 +298,12 @@
         if (blocked) payBtn.setAttribute('aria-describedby', 'cashResult');
         else payBtn.removeAttribute('aria-describedby');
       }
-      if (!cashMode) return;
+      if (!cashMode) { clearAmount(); return; }
 
       if (paid === null) {
         setState('idle');
         label.textContent = 'Escribe cuánto paga el cliente';
-        amount.textContent = '';
-        shown = 0;
+        clearAmount();
         breakdown.replaceChildren();
       } else if (paid < total) {
         setState('short');
